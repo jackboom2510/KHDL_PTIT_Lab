@@ -1,87 +1,119 @@
 # Báo cáo LAB 01 — LaTeX
 
-`lab01_report.tex` là báo cáo đầy đủ của LAB 01 (SQL/SQLite), viết bằng pdfLaTeX + `vntex`
-(hỗ trợ tiếng Việt chuẩn, có ngắt từ đúng).
+Thư mục này có **hai báo cáo**, phục vụ hai tình huống khác nhau của đề bài:
 
-## Nội dung báo cáo
+| File | Số trang | Khi nào dùng |
+| --- | --- | --- |
+| **`lab01_report_short.tex`** | **2–3 trang** | **Bản nộp chính** — đề yêu cầu "báo cáo PDF 2–3 trang" |
+| `lab01_report.tex` | ~10 trang | Bản đầy đủ (9 mục + 4 phụ lục), dùng khi không giới hạn trang hoặc để tham khảo/đối chiếu |
 
-| Phần | Nội dung |
-| --- | --- |
-| Trang bìa | điền tay: giảng viên, họ tên, MSSV, lớp, nhóm |
-| Tóm tắt | mục tiêu + kết quả chính |
-| 1 | Giới thiệu, mục tiêu, bảng phân chia bắt buộc/bổ sung |
-| 2 | Môi trường, quy trình, yêu cầu "chạy lặp an toàn" |
-| 3 | Mô hình dữ liệu: sơ đồ quan hệ (TikZ), schema, phân tích ràng buộc |
-| 4 | Dữ liệu mẫu, đối chiếu 5/5/6/8, kiểm tra khoá ngoại |
-| 5 | Kết quả S01–S15 (bảng kết quả thật, giải thích từng nhóm) |
-| 6 | Index + EXPLAIN: SCAN → SEARCH / COVERING INDEX, vì sao không đo bằng thời gian |
-| 7 | Kết quả S16–S21 trên dữ liệu mở rộng, gồm bảng so sánh `#table`/`##table`/`tempdb` |
-| 8 | Thảo luận, bài học |
-| 9 | Kết luận |
-| Phụ lục A–D | cấu trúc bài nộp, lệnh tái lập, danh mục ảnh minh chứng, trích mã, bảng đối chiếu rubric |
+Cả hai đều dùng pdfLaTeX + `vntex` (tiếng Việt có ngắt từ đúng).
 
 ## Biên dịch
 
 ```bash
 cd lab01_sql/report
-bash compile.sh          # bản đầy đủ
-bash compile.sh short    # bản gọn ~3 trang (tắt phụ lục)
+
+bash compile.sh          # = 2p: bản gọn 2–3 trang (mặc định) + tự kiểm tra số trang
+bash compile.sh full     # bản đầy đủ có phụ lục
+bash compile.sh short    # bản đầy đủ nhưng tắt phụ lục
+bash compile.sh check     # chỉ kiểm tra cú pháp, không compile
 ```
 
-Hoặc thủ công (chạy 2 lần để có mục lục và `\ref`):
+Hoặc thủ công (2 lần để có mục lục / `\ref`):
 
 ```bash
-pdflatex lab01_report.tex && pdflatex lab01_report.tex
+pdflatex lab01_report_short.tex && pdflatex lab01_report_short.tex
+python3 pdf_pages.py lab01_report_short.pdf --max 3
 ```
 
-Trên **Overleaf**: tạo project → upload thư mục `report/` → chọn compiler **pdfLaTeX** →
-Recompile. Không cần cài gì thêm vì Overleaf có sẵn `vntex`.
+**Overleaf:** tạo project → upload thư mục `report/` → *Menu → Compiler = pdfLaTeX* →
+Recompile. Đặt `lab01_report_short.tex` làm main document (Menu → Main document). Overleaf có
+sẵn `vntex` nên không cần cài gì.
+
+## Hai script kiểm tra (không cần TeX)
+
+| Script | Việc nó làm |
+| --- | --- |
+| `python3 check_tex.py *.tex` | Kiểm tra tĩnh: cân bằng `\begin/\end`, ngoặc nhọn, ký tự `_ # & % $` chưa escape, `\ref` ↔ `\label`, `\if`/`\fi`, **số ô mỗi hàng bảng so với khai báo cột** (lỗi `Extra alignment tab`). `compile.sh` chạy bước này trước khi compile. |
+| `python3 pdf_pages.py <pdf> [--max 3]` | Đếm số trang PDF (ưu tiên `pdfinfo`, không có thì đọc cấu trúc PDF) và **cảnh báo nếu vượt 3 trang**. `compile.sh 2p` tự gọi với `--max 3`. |
+
+Nhờ vậy sau khi compile bạn biết ngay báo cáo có vừa giới hạn hay không, thay vì mở trình đọc
+PDF đếm thủ công.
+
+## Cấu trúc bản gọn 2–3 trang (`lab01_report_short.tex`)
+
+Bố cục **2 cột, 10pt, lề 1.5–1.6cm**, bảng `\scriptsize` — đủ chỗ cho cả 5 tiêu chí chấm điểm mà
+không cần cắt nội dung chuyên môn:
+
+1. Tiêu đề + Tóm tắt (trải hết chiều ngang)
+2. Mục tiêu và môi trường — bảng môi trường + giải thích **tách bắt buộc (S01–S15) / bổ sung (S16–S21)**
+3. Mô hình dữ liệu — listing schema rút gọn + 3 quyết định thiết kế (khoá tổ hợp, `CHECK`, `PRAGMA foreign_keys`)
+4. Kết quả S01–S15 — bảng tổng hợp 15 câu, CRUD lặp an toàn, bảng S08/S09, nhóm truy vấn nâng cao
+5. Index & EXPLAIN — bảng trước/sau (`SCAN` → `COVERING INDEX`) + vì sao không đo bằng wall-clock
+6. S16–S21 — 6 gạch đầu dòng, mỗi câu kèm **số liệu thật** (13 tháng, 8 khách, 4 sản phẩm, top 3, S20, bảng tạm)
+7. Kết luận + 4 bài học + listing lệnh tái lập
+
+## Co giãn độ dài (nếu ra 4 trang)
+
+Sửa theo thứ tự, dừng khi vừa 3 trang:
+
+1. **Bỏ mục "Lệnh tái lập"** ở cuối (listing `bash`) — tiết kiệm ~0.3 trang.
+2. Đổi `\scriptsize` của các bảng thành `\tiny`, hoặc bỏ Bảng "Tổng hợp 15 câu bắt buộc" và giữ
+   lại nội dung quan trọng nhất dưới dạng câu văn.
+3. Giảm lề: `top=1.2cm,bottom=1.2cm,left=1.3cm,right=1.3cm,columnsep=0.5cm`.
+4. Rút mục 6 (S16–S21): gộp S21 còn 2 câu, bỏ phần giải thích `RANK` vs `DENSE_RANK`.
+5. Cuối cùng mới đổi `article` → `extarticle` (gói `extsizes`) với `9pt`:
+   `\documentclass[9pt,a4paper,twocolumn]{extarticle}`.
+
+Nếu **ít hơn 2 trang** thì thêm lại bảng `S16` theo tháng và đoạn thảo luận về `COVERING INDEX`
+từ bản đầy đủ (`lab01_report.tex`, mục 6).
 
 ## Yêu cầu gói TeX
 
-`vntex` (đi kèm `babel-vietnamese`), `booktabs`, `tabularx`, `longtable`, `multirow`,
-`enumitem`, `caption`, `fancyhdr`, `hyperref`, `listings`, `tikz` (`arrows.meta`).
+`vntex` (kèm `babel-vietnamese`), `booktabs`, `tabularx`, `array`, `enumitem`, `caption`,
+`float`, `listings`, `xcolor`, `titlesec` (bản gọn), `tikz` (chỉ bản đầy đủ), `fancyhdr` (bản đầy
+đủ), `hyperref`.
 
-Trên Debian/Ubuntu:
+Debian/Ubuntu:
 
 ```bash
-sudo apt-get install texlive-latex-extra texlive-lang-other texlive-fonts-recommended latexmk
+sudo apt-get install texlive-latex-extra texlive-lang-other texlive-fonts-recommended \
+                     texlive-pictures latexmk poppler-utils
 ```
 
-## Công tắc phụ lục
+`poppler-utils` cung cấp `pdfinfo` để `pdf_pages.py` đếm trang chính xác hơn.
 
-Ở đầu file có:
+## Công tắc phụ lục của bản đầy đủ
+
+Trong `lab01_report.tex`:
 
 ```latex
 \newif\ifwithappendix
-\withappendixtrue    % đổi thành \withappendixfalse để bỏ toàn bộ phụ lục
+\withappendixtrue    % \withappendixfalse để bỏ toàn bộ phụ lục
 ```
 
-Đề bài ghi báo cáo 2–3 trang; phần thân báo cáo (mục 1–9) đã chứa đủ nội dung chấm điểm, còn
-phụ lục dùng để nộp kèm khi không giới hạn số trang. Nếu cần đúng 2–3 trang, dùng
-`bash compile.sh short` và cân nhắc bỏ bớt Bảng 4–5 nếu vẫn quá dài.
+`bash compile.sh short` tự đổi sang `false`, compile, rồi khôi phục file như ban đầu.
 
 ## Phương án XeLaTeX (khi máy không có `vntex`)
 
-Thay ba dòng đầu phần "Tiếng Việt" bằng:
+Thay ba dòng phần "Tiếng Việt" (`inputenc`, `fontenc T5`, `babel vietnamese`) bằng:
 
 ```latex
-% bỏ: inputenc, fontenc T5, babel vietnamese
 \usepackage{fontspec}
 \setmainfont{DejaVu Serif}
 \setsansfont{DejaVu Sans}
 \setmonofont{DejaVu Sans Mono}
 ```
 
-rồi biên dịch bằng `xelatex` (2 lần) hoặc `latexmk -xelatex`. DejaVu có đủ glyph tiếng Việt và
-đi kèm TeX Live; đổi `DejaVu Serif` thành font khác nếu muốn (Noto Serif, Liberation Serif…).
-Nhược điểm: không có ngắt từ tiếng Việt như `vntex`.
+rồi compile bằng `xelatex` (2 lần) hoặc `latexmk -xelatex`. DejaVu có đủ glyph tiếng Việt và đi
+kèm TeX Live; nhược điểm là không có ngắt từ tiếng Việt như `vntex`.
 
 ## Ghi chú
 
-- Mọi số liệu trong báo cáo được lấy từ lần chạy thật trong repo
-  (`build_db.py`, `run_sql.py`, `generate_data.py`, `explain.sql`) — xem `../PLAN.md` mục 5.
+- Toàn bộ số liệu trong cả hai báo cáo lấy từ lần chạy thật trong repo (`build_db.py`,
+  `run_sql.py`, `generate_data.py`, `explain.sql`) — xem `../PLAN.md` mục 5.
 - Cảnh báo `Token not allowed in a PDF string` của hyperref khi gặp tiếng Việt trong bookmark là
-  **vô hại**, không ảnh hưởng nội dung PDF.
-- Trước khi nộp: điền trang bìa, dán ảnh minh chứng (danh mục ở Phụ lục B) hoặc nộp kèm thư mục
-  `../evidence/`, và đặt tên PDF theo MSSV nếu giảng viên yêu cầu.
+  **vô hại**.
+- Trước khi nộp: điền thông tin sinh viên trên dòng tiêu đề, dán ảnh minh chứng (danh mục ở phụ
+  lục B của bản đầy đủ) hoặc nộp kèm thư mục `../evidence/`.

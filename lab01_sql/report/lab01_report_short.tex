@@ -1,0 +1,333 @@
+% =====================================================================
+%  BÁO CÁO GỌN 2–3 TRANG — LAB 01: SQL TRÊN CLOUD SHELL VỚI SQLITE
+%  Introduction to Data Science — PTIT
+%
+%  Đây là bản NỘP CHÍNH (đúng giới hạn 2–3 trang của đề). Bản đầy đủ có phụ lục
+%  nằm ở lab01_report.tex, dùng khi không bị giới hạn số trang.
+%
+%  Biên dịch:
+%      bash compile.sh 2p          (hoặc: pdflatex lab01_report_short.tex, 2 lần)
+%  Bố cục 2 cột, 10pt, lề 1.6cm, bảng \footnotesize — đã tính để vừa 3 trang.
+%  Nếu máy bạn ra 4 trang: xem mục "Co giãn độ dài" trong report/README.md.
+% =====================================================================
+\documentclass[10pt,a4paper,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese]{babel}
+
+\usepackage[a4paper,top=1.5cm,bottom=1.5cm,left=1.6cm,right=1.6cm,columnsep=0.65cm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[hidelinks,unicode]{hyperref}
+
+% ---------- Nén khoảng cách để vừa 3 trang ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2.5pt}
+\renewcommand{\arraystretch}{1.08}
+\captionsetup{font=scriptsize,labelfont=bf,skip=3pt}
+\titlespacing*{\section}{0pt}{6pt}{3pt}
+\titlespacing*{\subsection}{0pt}{4pt}{2pt}
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection.}{0.4em}{}
+\titleformat{\subsection}{\normalfont\bfseries\normalsize}{\thesubsection}{0.4em}{}
+\setlist[itemize]{leftmargin=1.1em,itemsep=1pt,topsep=2pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=1.3em,itemsep=1pt,topsep=2pt,parsep=0pt}
+
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\definecolor{codebg}{gray}{0.95}
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{gray!60},
+  keywordstyle=\color{blue!60!black}\bfseries,
+  commentstyle=\color{green!35!black}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  aboveskip=3pt,
+  belowskip=3pt,
+  xleftmargin=1pt,
+  captionpos=b
+}
+
+\begin{document}
+
+% =====================================================================
+%  TIÊU ĐỀ (trải hết chiều ngang, không chia cột)
+% =====================================================================
+\twocolumn[{
+\begin{center}
+{\footnotesize TRƯỜNG ĐẠI HỌC BƯU CHÍNH VIỄN THÔNG (PTIT) \quad$\cdot$\quad KHOA CÔNG NGHỆ THÔNG TIN\par}
+\vspace{3pt}
+{\Large\bfseries BÁO CÁO THỰC HÀNH LAB 01\par}
+\vspace{1pt}
+{\large SQL trên Google Cloud Shell với SQLite\par}
+\vspace{2pt}
+{\footnotesize Môn: Introduction to Data Science \quad$\cdot$\quad
+GV: \dotfill\ \ SV: \dotfill\ \ MSSV: \dotfill\ \ Lớp: \dotfill\par}
+\vspace{2pt}
+{\color{black!30}\rule{\linewidth}{0.4pt}}
+\end{center}
+
+\noindent\textbf{Tóm tắt.} Báo cáo trình bày việc xây dựng cơ sở dữ liệu quan hệ bán hàng trực
+tuyến bốn bảng (\code{customers}, \code{products}, \code{orders}, \code{order\_items}) trên
+SQLite trong Google Cloud Shell, thực hiện CRUD, \code{JOIN}, \code{GROUP BY}/\code{HAVING},
+subquery, window function, rồi dùng index và \code{EXPLAIN QUERY PLAN} để chứng minh ảnh hưởng
+của index tới kế hoạch thực thi. Cả 21 yêu cầu (S01--S21) đã cài đặt và chạy kiểm chứng thực tế:
+0 lỗi, dữ liệu luôn thoả khoá ngoại, kế hoạch chuyển từ \code{SCAN orders} sang
+\code{SEARCH orders USING COVERING INDEX} sau khi tạo index.
+
+\vspace{3pt}
+}]
+
+% =====================================================================
+\section{Mục tiêu và môi trường}
+% =====================================================================
+
+Bài thực hành mô phỏng cửa hàng trực tuyến nhỏ với dữ liệu chuẩn hoá thành bốn bảng, nhằm trả lời
+các câu hỏi kinh doanh cơ bản (đơn giá trị cao nhất, khách chi tiêu nhiều nhất, sản phẩm bán
+chạy, doanh thu theo tháng) và rèn kỹ năng đọc kế hoạch truy vấn. Môi trường thực hiện hoàn toàn
+miễn phí, không bật Billing.
+
+\begin{table}[H]
+\centering
+\caption{Môi trường thực hành}
+\label{tab:env}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+Nền tảng & Google Cloud Shell (chế độ \code{\$HOME} bền vững) \\
+Python & 3.11.2, chỉ dùng thư viện chuẩn \code{sqlite3} \\
+CSDL & SQLite 3.40.1 (window function yêu cầu $\geq$ 3.25) \\
+Công cụ & \code{sql\_console.py}, \code{build\_db.py}, \code{generate\_data.py}, \code{run\_sql.py} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Phân chia nội dung.} Đề có hai khối yêu cầu với điều kiện dữ liệu khác nhau nên bài làm
+tách hai tệp đáp án riêng: \textbf{bắt buộc} S01--S15 trong \code{sql/answers.sql} chạy trên
+\code{data/sales.db} (dữ liệu mẫu của đề); \textbf{bổ sung/về nhà} S16--S21 trong
+\code{sql/answers\_homework.sql} chạy trên \code{data/sales\_extended.db} (dữ liệu mở rộng);
+phần chứng minh index ở \code{sql/explain.sql}. Cách tách này giúp người chấm thấy ngay đâu là
+yêu cầu tối thiểu, đâu là phần mở rộng.
+
+% =====================================================================
+\section{Mô hình dữ liệu}
+% =====================================================================
+
+Bốn bảng với ba quan hệ một--nhiều: \code{customers} (1--N) \code{orders},
+\code{orders} (1--N) \code{order\_items}, \code{products} (1--N) \code{order\_items}.
+
+\begin{lstlisting}[language=SQL,caption={Trích \code{sql/schema.sql}}]
+CREATE TABLE customers (
+  customer_id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL, city TEXT);
+
+CREATE TABLE products (
+  product_id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL, category TEXT,
+  price REAL CHECK(price >= 0));
+
+CREATE TABLE orders (
+  order_id INTEGER PRIMARY KEY,
+  customer_id INTEGER NOT NULL, order_date TEXT,
+  FOREIGN KEY(customer_id) REFERENCES customers(customer_id));
+
+CREATE TABLE order_items (
+  order_id INTEGER, product_id INTEGER,
+  quantity INTEGER CHECK(quantity > 0),
+  PRIMARY KEY(order_id, product_id),
+  FOREIGN KEY(order_id) REFERENCES orders(order_id),
+  FOREIGN KEY(product_id) REFERENCES products(product_id));
+\end{lstlisting}
+
+Ba quyết định thiết kế đáng chú ý: (i) khoá chính tổ hợp \code{(order\_id, product\_id)} ngăn một
+sản phẩm xuất hiện hai lần trong cùng đơn --- muốn mua thêm thì tăng \code{quantity};
+(ii) \code{CHECK} chặn giá âm và số lượng $\leq 0$ ngay tại tầng CSDL;
+(iii) SQLite \emph{không} kiểm tra khoá ngoại mặc định, nên mọi kết nối trong bài đều chạy
+\code{PRAGMA foreign\_keys = ON} ngay sau khi mở CSDL --- thiếu bước này thì ràng buộc chỉ còn là
+chú thích.
+
+% =====================================================================
+\section{Kết quả phần bắt buộc (S01--S15)}
+% =====================================================================
+
+Chạy \code{python3 run\_sql.py sql/answers.sql} thực thi 18 câu lệnh (gồm câu kiểm tra trung
+gian) với \textbf{0 lỗi}; chạy lần thứ hai vẫn 0 lỗi và cho kết quả giống hệt. Dữ liệu mẫu sau
+khi nạp khớp đúng kỳ vọng của đề: \code{customers}\,5, \code{products}\,5, \code{orders}\,6,
+\code{order\_items}\,8; \code{PRAGMA foreign\_key\_check} trả về rỗng.
+
+\begin{table}[H]
+\centering
+\caption{Tổng hợp 15 câu bắt buộc (số dòng là kết quả thực tế)}
+\label{tab:s01s15}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}l X r@{}}
+\toprule
+\textbf{Mã} & \textbf{Kỹ thuật} & \textbf{Dòng} \\
+\midrule
+S01 & \code{SELECT} + \code{ORDER BY} & 5 \\
+S02 & \code{WHERE price > 1000000} & 2 \\
+S03 & \code{ORDER BY price DESC} & 5 \\
+S04 & \code{INSERT ... ON CONFLICT DO NOTHING} & 1 \\
+S05 & \code{UPDATE ... SET price = price*1.1} & 1 \\
+S06 & \code{DELETE} + \code{NOT EXISTS} & 1 \\
+S07 & \code{INNER JOIN} hai bảng & 6 \\
+S08 & \code{JOIN} ba bảng, \code{GROUP BY}, \code{SUM} & 6 \\
+S09 & \code{LEFT JOIN} + \code{GROUP BY} & 5 \\
+S10 & \code{HAVING SUM(...) > 5000000} & 3 \\
+S11 & subquery vô hướng \code{> (SELECT AVG(price))} & 1 \\
+S12 & \code{HAVING COUNT(order\_id) >= 2} & 1 \\
+S13 & \code{ORDER BY} + \code{LIMIT 3} & 3 \\
+S14 & \code{CREATE INDEX} trên \code{orders(customer\_id)} & --- \\
+S15 & \code{EXPLAIN QUERY PLAN} & 1 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{CRUD lặp an toàn.} Ba câu có ghi (S04--S06) được viết để file chạy lại không sai dữ liệu:
+\code{INSERT ... ON CONFLICT(customer\_id) DO NOTHING}; \code{UPDATE} kèm điều kiện
+\code{AND price = 250000} nên không cộng dồn 10\% ở lần chạy sau (lần hai trả về
+\code{Rows affected: 0}); \code{DELETE} kèm \code{NOT EXISTS} đúng ngữ nghĩa "khách vừa thêm chưa
+có đơn" và đồng thời bảo vệ khoá ngoại. Kiểm chứng sau hai lần chạy: giá Mouse vẫn
+\textbf{275.000}, số khách trở về \textbf{5}.
+
+\begin{table}[H]
+\centering
+\caption{S08 (tổng tiền từng đơn) và S09 (doanh thu từng khách)}
+\label{tab:s08s09}
+\scriptsize
+\begin{tabular}{@{}r r@{\hspace{6pt}}l r@{}}
+\toprule
+\textbf{order} & \textbf{total} & \textbf{Khách} & \textbf{revenue} \\
+\midrule
+1001 & 15.550.000 & An (1)   & 17.150.000 \\
+1004 & 15.000.000 & Chi (3)  & 15.000.000 \\
+1006 &  7.000.000 & Ha (5)   &  7.000.000 \\
+1002 &  4.150.000 & Binh (2) &  4.150.000 \\
+1003 &  1.600.000 & Dung (4) &    825.000 \\
+1005 &    825.000 &          &           \\
+\midrule
+\multicolumn{1}{@{}r}{Tổng} & 44.125.000 & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Kiểm tra chéo: đơn 1001 gồm 1 Laptop (15.000.000) và 2 Mouse (2\,$\times$\,275.000) =
+15.550.000, khớp kết quả máy. Con số này cho thấy \textbf{thứ tự thực hiện có ảnh hưởng}: vì S05
+đã tăng giá Mouse trước khi chạy S08, tổng dùng giá 275.000 chứ không phải 250.000.
+
+\textbf{Nhóm truy vấn nâng cao.} S10 lọc theo kết quả tổng hợp nên phải dùng \code{HAVING}
+(không phải \code{WHERE}) --- đúng 3 khách An, Chi, Ha vượt 5 triệu. S11 so sánh với giá trung
+bình 4.045.000 (sau khi S05 đổi giá) nên chỉ Laptop vượt trung bình; subquery không tương quan
+nên SQLite tính một lần. S12 dùng \code{HAVING COUNT(o.order\_id) >= 2}, kết quả đúng một khách:
+An với 2 đơn. S13 lấy top 3 theo doanh thu: Laptop 30.000.000, Monitor 10.500.000, Headphones
+1.600.000 --- nhưng \code{LIMIT 3} không xử lý đồng hạng, muốn đúng phải dùng \code{RANK()} như
+S19.
+
+% =====================================================================
+\section{Index và kế hoạch thực thi (S14--S15)}
+% =====================================================================
+
+Vì S15 yêu cầu so sánh \emph{trước} và \emph{sau} index, \code{sql/explain.sql} tự đưa CSDL về
+trạng thái cần thiết: \code{DROP INDEX IF EXISTS} $\rightarrow$ \code{EXPLAIN} $\rightarrow$
+\code{CREATE INDEX IF NOT EXISTS} $\rightarrow$ \code{EXPLAIN}, nhờ vậy file chạy đúng trên bất kỳ
+bản sao CSDL nào.
+
+\begin{table}[H]
+\centering
+\caption{Kế hoạch thực thi trước/sau index \code{idx\_orders\_customer}}
+\label{tab:explain}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+Trước & \code{SCAN orders} \\
+Sau & \code{SEARCH orders USING COVERING INDEX idx\_orders\_customer (customer\_id=?)} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\code{SCAN} đọc tuần tự toàn bảng rồi mới lọc --- chi phí tăng tuyến tính theo số dòng.
+\code{SEARCH} đi xuống cây B-tree của index, chi phí $\sim\log n$ cộng số dòng khớp.
+\code{COVERING INDEX} là chi tiết đáng chú ý: câu chỉ cần \code{order\_id}, mà index trên
+\code{customer\_id} của bảng có \code{INTEGER PRIMARY KEY} đã chứa sẵn rowid (chính là
+\code{order\_id}), nên SQLite trả lời hoàn toàn từ index, không quay lại bảng; nếu lấy thêm
+\code{order\_date} (câu S20) thì kế hoạch là \code{SEARCH ... USING INDEX}.
+
+\textbf{Không kết luận bằng thời gian chạy.} Với 6 đơn, chênh lệch \code{SCAN}/\code{SEARCH} nằm
+dưới ngưỡng đo của đồng hồ hệ thống --- so sánh wall-clock sẽ kết luận sai là index "không có tác
+dụng". Cách đúng là đọc \emph{kế hoạch} (kiểu truy cập, số bước, có phải sort thêm hay không).
+
+% =====================================================================
+\section{Kết quả phần bổ sung (S16--S21)}
+% =====================================================================
+
+\textbf{Dữ liệu mở rộng.} \code{generate\_data.py} dùng \code{random.seed(2026)} để tái lập được
+và ghi vào \code{data/sales\_extended.db} (không ghi đè \code{sales.db}): \textbf{100} khách,
+\textbf{30} sản phẩm, \textbf{500} đơn, \textbf{1.500} dòng đơn (mỗi đơn 1--5 sản phẩm), vượt mức
+tối thiểu của đề (100/30/500/1.000), \code{foreign\_key\_check} \code{ok}. Kịch bản chủ động để
+$\sim$8\% khách không phát sinh đơn và 4 sản phẩm cuối không xuất hiện trong đơn nào, nhằm bảo
+đảm S17, S18 có kết quả.
+
+\begin{itemize}
+  \item \textbf{S16} doanh thu theo tháng (\code{strftime('\%Y-\%m', ...)}) cho 13 nhóm tháng
+        (10/2025--10/2026); cao nhất 2025-10 với 1.142.485.000\,đ / 53 đơn. Tháng cuối chỉ có 7
+        đơn --- hiện tượng \emph{tháng dở dang}, cần nêu rõ kỳ dữ liệu khi báo cáo.
+  \item \textbf{S17} khách chưa có đơn: \code{LEFT JOIN ... WHERE o.order\_id IS NULL} → 8 khách
+        (id 37, 38, 43, 56, 83, 89, 92, 94).
+  \item \textbf{S18} sản phẩm chưa từng bán: \code{NOT EXISTS} → 4 sản phẩm (Graphics Card,
+        RAM 16GB, CPU Cooler, Power Supply). Cả S17, S18 đều là bài toán "không có bản ghi tương
+        ứng"; \code{NOT EXISTS} được ưu tiên vì diễn đạt trực tiếp ngữ nghĩa.
+  \item \textbf{S19} xếp hạng bằng window function: top 3 là Ha 314.565.000, Ho Mai 281.910.000,
+        Hoang Chi 267.400.000. Dữ liệu này không có đồng hạng nên \code{RANK} và \code{DENSE\_RANK}
+        trùng nhau; khi có hai khách cùng hạng 2, \code{RANK} nhảy sang 4 còn \code{DENSE\_RANK}
+        sang 3 --- báo cáo "top N" nên dùng \code{DENSE\_RANK}.
+  \item \textbf{S20} sau khi mở rộng dữ liệu: chưa index là \code{SCAN orders}, có index là
+        \code{SEARCH orders USING INDEX idx\_orders\_customer} kèm
+        \code{USE TEMP B-TREE FOR ORDER BY} (do \code{ORDER BY order\_date} trên cột không nằm
+        trong index). Nếu truy vấn chạy thường xuyên, index tổ hợp
+        \code{(customer\_id, order\_date)} sẽ loại bỏ bước sort.
+  \item \textbf{S21} so sánh bảng tạm: SQL Server \code{\#t} là bảng tạm cục bộ theo session,
+        \code{\#\#t} là bảng tạm toàn cục dùng chung giữa các session, cả hai sống trong
+        \code{tempdb} (CSDL hệ thống, cũng chứa biến bảng và sort/hash spill). SQLite chỉ có
+        \code{CREATE TEMP TABLE} gắn với \emph{kết nối}, nằm trong schema \code{temp} (RAM hoặc
+        tệp tạm tuỳ \code{PRAGMA temp\_store}) và \textbf{không} có bảng tạm toàn cục; bảng
+        \code{temp} được tìm trước \code{main} nên trùng tên sẽ che bảng thường. Đã minh hoạ bằng
+        \code{TEMP TABLE} tổng hợp doanh thu tháng rồi \code{DROP TABLE temp.}.
+\end{itemize}
+
+% =====================================================================
+\section{Kết luận và bài học}
+% =====================================================================
+
+Cả 21 yêu cầu đã hoàn thành: CSDL bốn bảng đúng thiết kế với khoá chính/ngoại và \code{CHECK};
+dữ liệu mẫu 5/5/6/8; S01--S15 và S16--S21 chạy không lỗi và lặp an toàn; index được chứng minh
+bằng kế hoạch thực thi. Bốn bài học: (i) khoá ngoại SQLite là tuỳ chọn --- phải bật pragma;
+(ii) script có ghi phải lặp an toàn (\code{ON CONFLICT}, điều kiện chặt trong \code{UPDATE},
+\code{NOT EXISTS} trong \code{DELETE}); (iii) index không miễn phí --- chỉ tạo cho cột thường
+lọc/nối; (iv) đọc plan thay vì đo thời gian, đặc biệt chú ý \code{COVERING INDEX} và
+\code{USE TEMP B-TREE FOR ORDER BY} vì chúng chỉ ra chi phí ẩn.
+
+\begin{lstlisting}[language=bash,caption={Lệnh tái lập toàn bộ kết quả}]
+python3 build_db.py --force      # 5 / 5 / 6 / 8
+python3 run_sql.py sql/answers.sql
+python3 generate_data.py --force # 100 / 30 / 500 / 1500
+python3 run_sql.py sql/answers_homework.sql \
+        --db data/sales_extended.db
+python3 run_sql.py sql/explain.sql  # SCAN -> SEARCH
+\end{lstlisting}
+
+\end{document}
