@@ -69,9 +69,13 @@ phần nào là yêu cầu tối thiểu, phần nào là mở rộng.
 
 ## Báo cáo và minh chứng
 
-- Báo cáo viết bằng LaTeX: `report/lab01_report.tex`, biên dịch bằng `bash report/compile.sh`
-  (hoặc Overleaf, compiler pdfLaTeX, cần `vntex`). Công tắc `\withappendixtrue|false` ở đầu file
-  quyết định có phụ lục hay bản gọn ~3 trang.
+- Đề yêu cầu **báo cáo PDF 2–3 trang** → bản nộp chính là `report/lab01_report_short.tex`
+  (2 cột, 10pt). Bản `report/lab01_report.tex` (~10 trang, có phụ lục) chỉ để tham khảo/đối chiếu,
+  **không** dùng làm bản nộp khi bị giới hạn trang.
+- Biên dịch: `bash compile.sh` (= `2p`), hoặc `full`/`short`/`check`. Trước khi compile script
+  chạy `check_tex.py` (bắt lỗi escape, cân bằng môi trường, số ô bảng); sau compile chạy
+  `pdf_pages.py --max 3` để cảnh báo vượt trang. Nếu ra 4 trang: xem "Co giãn độ dài" trong
+  `report/README.md`, không tự ý xoá nội dung chuyên môn.
 - Số liệu trong báo cáo **phải khớp** output thật của `run_sql.py`; khi sửa dữ liệu/seed phải
   chạy lại các lệnh ở mục "Kiểm tra trước khi nộp" và cập nhật bảng trong báo cáo.
 - `evidence/` đặt tên `01_env.png`, `02_tables_count.png`, `03_s08_result.png`,

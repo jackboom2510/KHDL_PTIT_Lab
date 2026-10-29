@@ -34,9 +34,12 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   │   └── explain.sql        # EXPLAIN trước/sau index (S15, S20)
 │   ├── data/                  # sales.db, sales_extended.db (sinh tự động, không commit)
 │   ├── report/                # báo cáo LaTeX + PDF
-│   │   ├── lab01_report.tex   # báo cáo đầy đủ (9 mục + 4 phụ lục)
-│   │   ├── compile.sh         # biên dịch: bash compile.sh [short]
-│   │   └── README.md          # hướng dẫn compile / Overleaf / XeLaTeX
+│   │   ├── lab01_report_short.tex # BẢN NỘP: gọn 2–3 trang, 2 cột
+│   │   ├── lab01_report.tex   # bản đầy đủ (9 mục + 4 phụ lục), tham khảo
+│   │   ├── compile.sh         # bash compile.sh [2p|full|short|check]
+│   │   ├── check_tex.py       # kiểm tra cú pháp LaTeX (không cần TeX)
+│   │   ├── pdf_pages.py       # đếm số trang PDF, cảnh báo nếu > 3
+│   │   └── README.md          # hướng dẫn compile / Overleaf / co giãn độ dài
 │   └── evidence/              # ảnh minh chứng
 ├── lab02_nosql/
 │   ├── AGENTS.md
@@ -78,12 +81,13 @@ python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 
 Kiểm tra nhanh dữ liệu mẫu: `customers = 5`, `products = 5`, `orders = 6`, `order_items = 8`.
 
-Báo cáo (LaTeX):
+Báo cáo (LaTeX) — đề yêu cầu **PDF 2–3 trang**:
 
 ```bash
 cd lab01_sql/report
-bash compile.sh            # bản đầy đủ, có phụ lục
-bash compile.sh short      # bản gọn ~3 trang
+bash compile.sh            # = 2p: bản nộp 2–3 trang (tự kiểm tra số trang sau compile)
+bash compile.sh full       # bản đầy đủ có phụ lục (~10 trang), để tham khảo
+bash compile.sh check      # chỉ kiểm tra cú pháp LaTeX
 ```
 
 Cần TeX Live có `vntex`/`babel-vietnamese`; hoặc upload thư mục `report/` lên Overleaf và chọn
