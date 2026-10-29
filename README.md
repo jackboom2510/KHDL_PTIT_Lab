@@ -33,7 +33,10 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   │   ├── answers_homework.sql # BỔ SUNG — S16–S21
 │   │   └── explain.sql        # EXPLAIN trước/sau index (S15, S20)
 │   ├── data/                  # sales.db, sales_extended.db (sinh tự động, không commit)
-│   ├── report/                # báo cáo PDF 2–3 trang
+│   ├── report/                # báo cáo LaTeX + PDF
+│   │   ├── lab01_report.tex   # báo cáo đầy đủ (9 mục + 4 phụ lục)
+│   │   ├── compile.sh         # biên dịch: bash compile.sh [short]
+│   │   └── README.md          # hướng dẫn compile / Overleaf / XeLaTeX
 │   └── evidence/              # ảnh minh chứng
 ├── lab02_nosql/
 │   ├── AGENTS.md
@@ -74,6 +77,17 @@ python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 ```
 
 Kiểm tra nhanh dữ liệu mẫu: `customers = 5`, `products = 5`, `orders = 6`, `order_items = 8`.
+
+Báo cáo (LaTeX):
+
+```bash
+cd lab01_sql/report
+bash compile.sh            # bản đầy đủ, có phụ lục
+bash compile.sh short      # bản gọn ~3 trang
+```
+
+Cần TeX Live có `vntex`/`babel-vietnamese`; hoặc upload thư mục `report/` lên Overleaf và chọn
+pdfLaTeX. Chi tiết: [`lab01_sql/report/README.md`](lab01_sql/report/README.md).
 `answers.sql` chạy lại nhiều lần vẫn sạch: S05 chỉ nhân 10% khi Mouse còn ở giá gốc 250.000,
 S06 xoá đúng khách vừa thêm.
 

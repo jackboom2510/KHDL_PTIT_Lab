@@ -69,6 +69,11 @@ phần nào là yêu cầu tối thiểu, phần nào là mở rộng.
 
 ## Báo cáo và minh chứng
 
+- Báo cáo viết bằng LaTeX: `report/lab01_report.tex`, biên dịch bằng `bash report/compile.sh`
+  (hoặc Overleaf, compiler pdfLaTeX, cần `vntex`). Công tắc `\withappendixtrue|false` ở đầu file
+  quyết định có phụ lục hay bản gọn ~3 trang.
+- Số liệu trong báo cáo **phải khớp** output thật của `run_sql.py`; khi sửa dữ liệu/seed phải
+  chạy lại các lệnh ở mục "Kiểm tra trước khi nộp" và cập nhật bảng trong báo cáo.
 - `evidence/` đặt tên `01_env.png`, `02_tables_count.png`, `03_s08_result.png`,
   `04_explain_before_after.png`, `05_expanded_counts.png`, `06_rank.png`…
 - Báo cáo `report/lab01_report.md` → xuất PDF 2–3 trang, cấu trúc: môi trường → mô hình dữ

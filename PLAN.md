@@ -15,7 +15,7 @@ Nguồn yêu cầu: hai PDF ở thư mục gốc. Chi tiết trích đề: `docs
 | M3 | LAB 01 — index/EXPLAIN S14–S15 + mở rộng dữ liệu S16–S21 | ✅ |
 | M4 | LAB 02 — Atlas, seed, CRUD, filter (N01–N09) | ⬜ |
 | M5 | LAB 02 — aggregation, `$lookup`, index, homework (N10–N22) | ⬜ |
-| M6 | Báo cáo PDF 2–3 trang + ảnh minh chứng + đóng ZIP nộp bài | ⬜ |
+| M6 | Báo cáo PDF 2–3 trang + ảnh minh chứng + đóng ZIP nộp bài | 🟡 (LAB 01: .tex xong, còn PDF + ảnh) |
 
 ## 1. LAB 01 — SQL / SQLite
 
@@ -63,6 +63,13 @@ chứng minh index ở `sql/explain.sql`. Chi tiết kết quả đã kiểm ch�
 - [x] S19 xếp hạng khách theo doanh thu bằng `RANK()`/`DENSE_RANK()` (window function).
 - [x] S20 so sánh `EXPLAIN QUERY PLAN` sau khi mở rộng dữ liệu + đã tạo index.
 - [x] S21 bảng so sánh SQL Server `#table` / `##table` / `tempdb` với SQLite `TEMP TABLE`.
+
+### 1.3b Báo cáo
+
+- [x] `report/lab01_report.tex` — báo cáo đầy đủ (9 mục + 4 phụ lục), số liệu lấy từ lần chạy thật.
+- [x] `report/compile.sh` + `report/README.md` (Overleaf, bản gọn, phương án XeLaTeX).
+- [ ] Biên dịch ra PDF (cần TeX Live có `vntex`; sandbox không cài được — chặn CTAN).
+- [ ] Điền trang bìa (giảng viên, MSSV, lớp) và dán ảnh minh chứng vào Phụ lục B.
 
 ### 1.4 Nộp
 

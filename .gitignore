@@ -41,3 +41,22 @@ Thumbs.db
 *.log
 *.tmp
 ~$*
+
+# LaTeX build artifacts (giữ .tex và .pdf, bỏ file phụ)
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+!*.pdf
