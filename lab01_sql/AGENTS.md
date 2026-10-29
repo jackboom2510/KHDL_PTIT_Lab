@@ -11,15 +11,32 @@
 
 ## File và trách nhiệm
 
+### Tách phần bắt buộc và phần bổ sung
+
+Bài **bắt buộc** (S01–S15) và bài **bổ sung/về nhà** (S16–S21) **luôn nằm ở hai file riêng**,
+không trộn chung. Lý do: phần bắt buộc chạy trên `data/sales.db` (dữ liệu mẫu trong đề), phần
+bổ sung cần dữ liệu lớn trong `data/sales_extended.db`; tách file còn giúp người chấm thấy ngay
+phần nào là yêu cầu tối thiểu, phần nào là mở rộng.
+
+| Phần | File | CSDL đích | Nội dung |
+| --- | --- | --- | --- |
+| Bắt buộc | `sql/answers.sql` | `data/sales.db` | S01–S15 |
+| Bổ sung / về nhà | `sql/answers_homework.sql` | `data/sales_extended.db` | S16–S21 |
+| Chứng minh index | `sql/explain.sql` | cả hai | EXPLAIN trước/sau index (S15), sau mở rộng (S20) |
+
+### File và trách nhiệm
+
 | File | Vai trò | Bắt buộc nộp |
 | --- | --- | --- |
 | `sql_console.py` | Console SQLite tương tác, dừng câu lệnh bằng `;`, thoát bằng `EXIT`, giữ buffer nhiều dòng | ✅ |
-| `schema.sql` | `CREATE TABLE` cho 4 bảng, đúng tên cột và ràng buộc như PDF | nên có |
-| `seed.sql` | `INSERT` dữ liệu mẫu PDF (5/5/6/8 dòng) | nên có |
-| `answers.sql` | Toàn bộ S01–S21, mỗi câu mở đầu bằng comment `-- Sxx: <mô tả>` | ✅ |
-| `explain.sql` | Cặp `EXPLAIN QUERY PLAN` trước/sau index cho S15 và S20, kèm comment nhận xét | ✅ |
-| `build_db.py` | Đọc `schema.sql` + `seed.sql`, tạo lại `data/sales.db` | nên có |
-| `generate_data.py` | Sinh dữ liệu mở rộng (100 khách / 30 sản phẩm / 500 đơn / 1.000 dòng đơn) | ✅ |
+| `sql/schema.sql` | `CREATE TABLE` cho 4 bảng, đúng tên cột và ràng buộc như PDF | nên có |
+| `sql/seed.sql` | `INSERT` dữ liệu mẫu PDF (5/5/6/8 dòng) | nên có |
+| `sql/answers.sql` | **S01–S15** (bắt buộc), mỗi câu mở đầu bằng comment `-- Sxx: <mô tả>` | ✅ |
+| `sql/answers_homework.sql` | **S16–S21** (bổ sung), cùng quy ước comment `-- Sxx:` | ✅ |
+| `sql/explain.sql` | `EXPLAIN QUERY PLAN` trước/sau index, tự DROP + CREATE index để chạy lại được | ✅ |
+| `build_db.py` | Đọc `schema.sql` + `seed.sql`, tạo lại `data/sales.db`, in count để tự kiểm tra | nên có |
+| `generate_data.py` | Sinh `data/sales_extended.db` (100 khách / 30 SP / 500 đơn / 1.500 dòng đơn) | ✅ |
+| `run_sql.py` | Chạy file `.sql` bằng Python khi máy không có sqlite3 CLI, in kết quả từng câu | nên có |
 | `data/sales.db` | CSDL sinh tự động — không commit, nhưng phải có trong file ZIP nộp | ✅ (trong ZIP) |
 
 ## Quy ước SQL
@@ -60,9 +77,15 @@
 ## Kiểm tra trước khi nộp (chạy được trong sandbox)
 
 ```bash
-python3 build_db.py --force
-python3 -c "import sqlite3;print(sqlite3.connect('data/sales.db').execute('select count(*) from order_items').fetchone())"
-sqlite3 data/sales.db < answers.sql   # nếu có sqlite3 CLI; nếu không dùng sql_console.py
-python3 generate_data.py --force
-sqlite3 data/sales.db < explain.sql
+cd lab01_sql
+python3 build_db.py --force                 # kỳ vọng 5 / 5 / 6 / 8
+python3 run_sql.py sql/answers.sql          # S01–S15, kỳ vọng "0 lỗi"
+python3 run_sql.py sql/answers.sql          # chạy lần 2: vẫn 0 lỗi (kiểm tra idempotent)
+python3 generate_data.py --force            # 100 / 30 / 500 / 1500, foreign_key_check ok
+python3 run_sql.py sql/answers_homework.sql --db data/sales_extended.db
+python3 run_sql.py sql/explain.sql          # SCAN orders -> SEARCH ... INDEX
+python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 ```
+
+Nếu máy có sqlite3 CLI thì các lệnh trên tương đương
+`sqlite3 data/sales.db < sql/answers.sql`.

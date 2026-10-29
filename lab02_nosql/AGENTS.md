@@ -25,9 +25,19 @@
 | `connect.py` | `get_database()` → `client['sales_nosql']`, có `ping()` và `serverSelectionTimeoutMS=12000` | ✅ |
 | `seed.py` | Seed 3 collection với `items` nhúng; dừng nếu collection đã có dữ liệu | ✅ |
 | `lab_queries.py` | Các ví dụ CRUD/aggregation đúng như PDF mục 7 và 9 | ✅ |
-| `n_answers.py` | Giải N01–N22, mỗi câu một hàm `n01()`, `n02()`… in kết quả | ✅ |
+| `n_answers.py` | Giải **N01–N15** (bắt buộc), mỗi câu một hàm `n01()`, `n02()`… in kết quả | ✅ |
+| `n_homework.py` | Giải **N16–N22** (bổ sung/về nhà), cùng quy ước hàm và nhãn `=== N16 ===` | ✅ |
 | `generate_data.py` | Sinh ≥500 đơn, mỗi đơn 1–5 sản phẩm, `customer_id`/`product_id` hợp lệ | ✅ |
 | `data/` | File JSON trung gian nếu cần — không commit | — |
+
+### Tách phần bắt buộc và phần bổ sung
+
+Giống LAB 01, hai phần **không trộn file**:
+
+| Phần | File | Dữ liệu | Nội dung |
+| --- | --- | --- | --- |
+| Bắt buộc | `n_answers.py` | bộ seed 5/5/6 của đề | N01–N15 |
+| Bổ sung / về nhà | `n_homework.py` | ≥500 đơn do `generate_data.py` sinh | N16–N22 |
 
 ## Quy ước dữ liệu
 

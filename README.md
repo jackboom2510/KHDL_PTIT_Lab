@@ -7,8 +7,8 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 | LAB 01 | SQL trên Google Cloud Shell với SQLite (S01–S21) | [`lab01_sql/`](lab01_sql/) | [PDF](Lab_01_SQL_Google_Cloud_Shell_IntroDataScience.pdf) |
 | LAB 02 | NoSQL — MongoDB Atlas Free + PyMongo (N01–N22) | [`lab02_nosql/`](lab02_nosql/) | [PDF](Lab_02_NoSQL_MongoDB_Google_Cloud_IntroDataScience.pdf) |
 
-> Trạng thái hiện tại: **đã dựng khung repo** (cấu trúc thư mục, tài liệu yêu cầu, kế hoạch).
-> Bài giải sẽ được thêm theo các mốc trong [`PLAN.md`](PLAN.md).
+> Trạng thái hiện tại: **LAB 01 đã hoàn thành và chạy kiểm chứng** (S01–S21); LAB 02 đang ở bước
+> thiết lập. Tiến độ chi tiết: [`PLAN.md`](PLAN.md).
 
 ## Cấu trúc
 
@@ -22,12 +22,23 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   └── lab02_requirements.md  # trích yêu cầu LAB 02 từ PDF
 ├── lab01_sql/
 │   ├── AGENTS.md
-│   ├── data/                  # sales.db (sinh tự động, không commit)
-│   ├── sql/                   # schema.sql, seed.sql, answers.sql, explain.sql
+│   ├── sql_console.py         # console SQLite (bắt buộc nộp)
+│   ├── build_db.py            # dựng data/sales.db từ sql/ + kiểm tra count
+│   ├── generate_data.py       # sinh data/sales_extended.db (100/30/500/1500)
+│   ├── run_sql.py             # chạy file .sql bằng Python (khi không có sqlite3 CLI)
+│   ├── sql/
+│   │   ├── schema.sql         # 4 bảng + khoá ngoại
+│   │   ├── seed.sql           # dữ liệu mẫu đúng đề (5/5/6/8)
+│   │   ├── answers.sql        # BẮT BUỘC  — S01–S15
+│   │   ├── answers_homework.sql # BỔ SUNG — S16–S21
+│   │   └── explain.sql        # EXPLAIN trước/sau index (S15, S20)
+│   ├── data/                  # sales.db, sales_extended.db (sinh tự động, không commit)
 │   ├── report/                # báo cáo PDF 2–3 trang
 │   └── evidence/              # ảnh minh chứng
 ├── lab02_nosql/
 │   ├── AGENTS.md
+│   ├── n_answers.py           # BẮT BUỘC  — N01–N15 (sẽ thêm ở M4)
+│   ├── n_homework.py          # BỔ SUNG — N16–N22 (sẽ thêm ở M5)
 │   ├── data/                  # dữ liệu trung gian (không commit)
 │   ├── report/
 │   └── evidence/
@@ -43,13 +54,28 @@ Chỉ cần Python 3 (thư viện chuẩn `sqlite3`), không cần cài thêm g�
 
 ```bash
 cd lab01_sql
-python3 build_db.py --force          # dựng data/sales.db từ sql/schema.sql + sql/seed.sql
-python3 sql_console.py               # console tương tác: gõ SQL kết thúc bằng ';', EXIT để thoát
-python3 generate_data.py --force     # sinh dữ liệu mở rộng 100 khách / 30 SP / 500 đơn / 1000 dòng
-sqlite3 data/sales.db < sql/answers.sql   # chạy toàn bộ S01–S21 (nếu có sqlite3 CLI)
+
+# 1) Dữ liệu mẫu trong đề
+python3 build_db.py --force            # 5 khách / 5 SP / 6 đơn / 8 dòng đơn
+python3 sql_console.py                 # console: gõ SQL kết thúc bằng ';', EXIT để thoát
+
+# 2) Phần BẮT BUỘC — S01–S15 (data/sales.db)
+python3 run_sql.py sql/answers.sql
+# hoặc nếu máy có sqlite3 CLI:
+# sqlite3 data/sales.db < sql/answers.sql
+
+# 3) Dữ liệu mở rộng + phần BỔ SUNG — S16–S21
+python3 generate_data.py --force       # 100 khách / 30 SP / 500 đơn / 1.500 dòng đơn
+python3 run_sql.py sql/answers_homework.sql --db data/sales_extended.db
+
+# 4) Chứng minh index: SCAN orders -> SEARCH ... USING INDEX
+python3 run_sql.py sql/explain.sql
+python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 ```
 
 Kiểm tra nhanh dữ liệu mẫu: `customers = 5`, `products = 5`, `orders = 6`, `order_items = 8`.
+`answers.sql` chạy lại nhiều lần vẫn sạch: S05 chỉ nhân 10% khi Mouse còn ở giá gốc 250.000,
+S06 xoá đúng khách vừa thêm.
 
 ## Chạy LAB 02 (MongoDB Atlas)
 
@@ -71,8 +97,9 @@ python3 n_answers.py      # đáp án N01–N22
 
 ## Nộp bài
 
-- `StudentID_SQL.zip` — `sales.db`, `sql_console.py`, `answers.sql` (S01–S21), script sinh dữ
-  liệu mở rộng, báo cáo PDF 2–3 trang, ảnh minh chứng.
+- `StudentID_SQL.zip` — `data/sales.db`, `sql_console.py`, `sql/answers.sql` (S01–S15),
+  `sql/answers_homework.sql` (S16–S21), `sql/explain.sql`, `build_db.py`, `generate_data.py`,
+  `run_sql.py`, báo cáo PDF 2–3 trang, ảnh minh chứng.
 - `StudentID_NoSQL.zip` — `connect.py`, `seed.py`, `lab_queries.py`, mã giải N01–N22, báo cáo
   PDF 2–3 trang, ảnh Data Explorer/terminal.
 
@@ -80,10 +107,11 @@ python3 n_answers.py      # đáp án N01–N22
 
 ```bash
 cd lab01_sql && zip -r ../submission/StudentID_SQL.zip \
-  data/sales.db sql_console.py sql/schema.sql sql/seed.sql sql/answers.sql \
-  sql/explain.sql build_db.py generate_data.py report evidence
+  data/sales.db sql_console.py build_db.py generate_data.py run_sql.py \
+  sql/schema.sql sql/seed.sql sql/answers.sql sql/answers_homework.sql sql/explain.sql \
+  report evidence
 cd ../lab02_nosql && zip -r ../submission/StudentID_NoSQL.zip \
-  connect.py seed.py lab_queries.py n_answers.py generate_data.py report evidence
+  connect.py seed.py lab_queries.py n_answers.py n_homework.py generate_data.py report evidence
 ```
 
 ## Tài liệu tham khảo

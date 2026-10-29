@@ -35,13 +35,16 @@ SQLite) và LAB 02 (NoSQL trên MongoDB Atlas). Hai đề bài gốc nằm ở t
 ├── lab01_sql/
 │   ├── AGENTS.md              # quy ước riêng LAB 01
 │   ├── sql_console.py         # console SQLite (bắt buộc nộp)
-│   ├── schema.sql             # CREATE TABLE
-│   ├── seed.sql               # INSERT dữ liệu mẫu trong PDF
-│   ├── answers.sql            # S01–S21, mỗi câu bắt đầu bằng `-- Sxx`
-│   ├── explain.sql            # EXPLAIN QUERY PLAN trước/sau index (S15, S20)
-│   ├── build_db.py            # dựng sales.db từ schema.sql + seed.sql
-│   ├── generate_data.py       # sinh dữ liệu mở rộng (100/30/500/1000)
-│   ├── data/                  # sales.db — sinh tự động, KHÔNG commit
+│   ├── build_db.py            # dựng data/sales.db + in count để tự kiểm tra
+│   ├── generate_data.py       # sinh data/sales_extended.db (100/30/500/1500)
+│   ├── run_sql.py             # chạy file .sql bằng Python khi không có sqlite3 CLI
+│   ├── sql/
+│   │   ├── schema.sql         # CREATE TABLE
+│   │   ├── seed.sql           # INSERT dữ liệu mẫu trong PDF
+│   │   ├── answers.sql        # BẮT BUỘC  — S01–S15
+│   │   ├── answers_homework.sql # BỔ SUNG — S16–S21
+│   │   └── explain.sql        # EXPLAIN QUERY PLAN trước/sau index (S15, S20)
+│   ├── data/                  # sales.db, sales_extended.db — sinh tự động, KHÔNG commit
 │   ├── report/                # báo cáo PDF 2–3 trang
 │   └── evidence/              # ảnh chụp màn hình minh chứng
 ├── lab02_nosql/
@@ -49,13 +52,26 @@ SQLite) và LAB 02 (NoSQL trên MongoDB Atlas). Hai đề bài gốc nằm ở t
 │   ├── connect.py             # kết nối Atlas qua getpass (bắt buộc nộp)
 │   ├── seed.py                # seed 3 collection mẫu (bắt buộc nộp)
 │   ├── lab_queries.py         # ví dụ CRUD/aggregation trong PDF
-│   ├── n_answers.py           # N01–N22
+│   ├── n_answers.py           # BẮT BUỘC  — N01–N15
+│   ├── n_homework.py          # BỔ SUNG — N16–N22
 │   ├── generate_data.py       # sinh 500 đơn, mỗi đơn 1–5 sản phẩm
 │   ├── data/                  # JSON/CSV trung gian — KHÔNG commit
 │   ├── report/                # báo cáo PDF 2–3 trang
 │   └── evidence/              # ảnh Data Explorer, terminal
 └── submission/                # ZIP bài nộp — KHÔNG commit
 ```
+
+## 2.1 Tách phần bắt buộc / bổ sung
+
+Mỗi lab tách **hai file đáp án riêng**, không trộn câu bắt buộc với câu về nhà:
+
+| Lab | Bắt buộc | Bổ sung / về nhà |
+| --- | --- | --- |
+| LAB 01 | `lab01_sql/sql/answers.sql` — S01–S15 | `lab01_sql/sql/answers_homework.sql` — S16–S21 |
+| LAB 02 | `lab02_nosql/n_answers.py` — N01–N15 | `lab02_nosql/n_homework.py` — N16–N22 |
+
+Lý do: mỗi phần có dữ liệu và cách chạy khác nhau (mẫu vs mở rộng), người chấm nhìn file là biết
+đâu là yêu cầu tối thiểu. Không chuyển câu giữa hai file mà không ghi lại trong `PLAN.md`.
 
 ## 3. Quy ước code
 
