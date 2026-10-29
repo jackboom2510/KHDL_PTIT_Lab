@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Database — sinh tự động bằng build_db.py / generate_data.py
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+lab01_sql/data/*
+!lab01_sql/data/.gitkeep
+
+# Dữ liệu trung gian của lab NoSQL
+lab02_nosql/data/*
+!lab02_nosql/data/.gitkeep
+
+# Bí mật — tuyệt đối không commit
+.env
+.env.*
+*.pem
+secrets.*
+lab02_nosql/.mongodb_uri
+
+# Bài nộp — đóng gói lại khi cần
+submission/*
+!submission/.gitkeep
+
+# Hệ điều hành / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Log / file tạm
+*.log
+*.tmp
+~$*
+
+# LaTeX build artifacts (giữ .tex và .pdf, bỏ file phụ)
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+!*.pdf
