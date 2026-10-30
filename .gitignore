@@ -26,6 +26,9 @@ lab02_nosql/data/*
 secrets.*
 lab02_nosql/.mongodb_uri
 
+# Ảnh PGM sinh ra bởi docs/svd_demo.py --save
+docs/svd_out/
+
 # Bài nộp — đóng gói lại khi cần
 submission/*
 !submission/.gitkeep

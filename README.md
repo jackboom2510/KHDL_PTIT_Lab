@@ -19,7 +19,9 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 ├── README.md
 ├── docs/
 │   ├── lab01_requirements.md  # trích yêu cầu LAB 01 từ PDF
-│   └── lab02_requirements.md  # trích yêu cầu LAB 02 từ PDF
+│   ├── lab02_requirements.md  # trích yêu cầu LAB 02 từ PDF
+│   ├── svd_guide.md           # hướng dẫn phân rã SVD (lý thuyết + ví dụ + ứng dụng)
+│   └── svd_demo.py            # demo chạy lại mọi con số trong svd_guide.md
 ├── lab01_sql/
 │   ├── AGENTS.md
 │   ├── sql_console.py         # console SQLite (bắt buộc nộp)
@@ -50,6 +52,14 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   └── evidence/
 └── submission/                # ZIP bài nộp (không commit)
 ```
+
+## Tài liệu ôn tập
+
+- [`docs/svd_guide.md`](docs/svd_guide.md) — **Phân rã ma trận SVD**: trực giác hình học,
+  cách tính (tính tay 2×2 → Golub–Kahan → randomized SVD), xấp xỉ hạng thấp và định lý
+  Eckart–Young, cách chọn `k`, 5 ứng dụng có code (nén ảnh, LSA, gợi ý phim, PCA, giả nghịch
+  đảo), bẫy thường gặp và bài tập có đáp án. Chạy `python3 docs/svd_demo.py` (cần `numpy`) để
+  in lại đúng các số liệu trong tài liệu.
 
 Quy ước chi tiết: [`AGENTS.md`](AGENTS.md), [`lab01_sql/AGENTS.md`](lab01_sql/AGENTS.md),
 [`lab02_nosql/AGENTS.md`](lab02_nosql/AGENTS.md).
