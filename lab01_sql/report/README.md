@@ -4,8 +4,23 @@ Thư mục này có **hai báo cáo**, phục vụ hai tình huống khác nhau 
 
 | File | Số trang | Khi nào dùng |
 | --- | --- | --- |
-| **`lab01_report_short.tex`** | **2–3 trang** | **Bản nộp chính** — đề yêu cầu "báo cáo PDF 2–3 trang" |
-| `lab01_report.tex` | ~10 trang | Bản đầy đủ (9 mục + 4 phụ lục), dùng khi không giới hạn trang hoặc để tham khảo/đối chiếu |
+| **`lab01_report_short_pdf.pdf`** | **3 trang** | **Bản nộp chính đã xuất** — sinh bằng `make_pdf.py`, có 6 ảnh minh chứng thật |
+| `make_pdf.py` | — | Xuất PDF trực tiếp bằng Python (**không cần TeX**) — dùng khi máy không có pdflatex |
+| `lab01_report_short.tex` | 2–3 trang | Bản LaTeX tương đương (2 cột) — dùng khi có TeX hoặc nộp trên Overleaf |
+| `lab01_report.tex` | ~10 trang | Bản đầy đủ (9 mục + 4 phụ lục), tham khảo/đối chiếu |
+
+### Xuất PDF không cần TeX (đường dùng được trong sandbox / máy chỉ có Python)
+
+```bash
+cd lab01_sql/report
+pip install -r ../evidence/requirements.txt     # fpdf2 + pillow
+python3 make_pdf.py            # -> lab01_report_short_pdf.pdf, tự co ảnh cho vừa 3 trang
+python3 make_pdf.py --no-images # bản không ảnh (nhẹ hơn, ~4 trang chữ)
+```
+
+`make_pdf.py` đọc ảnh từ `../evidence/*.png`; nếu chưa có thì tự gọi
+`evidence/make_evidence.py`. Script thử co ảnh dần (×1.0 → ×0.88 → ×0.78 …), cuối cùng bỏ
+Hình 6 (console) để luôn ra ≤ 3 trang, và in số trang sau khi xuất.
 
 Cả hai đều dùng pdfLaTeX + `vntex` (tiếng Việt có ngắt từ đúng).
 
@@ -31,12 +46,13 @@ python3 pdf_pages.py lab01_report_short.pdf --max 3
 Recompile. Đặt `lab01_report_short.tex` làm main document (Menu → Main document). Overleaf có
 sẵn `vntex` nên không cần cài gì.
 
-## Hai script kiểm tra (không cần TeX)
+## Ba script kiểm tra / xuất PDF (không cần TeX)
 
 | Script | Việc nó làm |
 | --- | --- |
 | `python3 check_tex.py *.tex` | Kiểm tra tĩnh: cân bằng `\begin/\end`, ngoặc nhọn, ký tự `_ # & % $` chưa escape, `\ref` ↔ `\label`, `\if`/`\fi`, **số ô mỗi hàng bảng so với khai báo cột** (lỗi `Extra alignment tab`). `compile.sh` chạy bước này trước khi compile. |
 | `python3 pdf_pages.py <pdf> [--max 3]` | Đếm số trang PDF (ưu tiên `pdfinfo`, không có thì đọc cấu trúc PDF) và **cảnh báo nếu vượt 3 trang**. `compile.sh 2p` tự gọi với `--max 3`. |
+| `python3 make_pdf.py` | Xuất `lab01_report_short_pdf.pdf` bằng fpdf2 + DejaVu (đủ glyph tiếng Việt), chèn 6 ảnh minh chứng, tự co cho vừa 3 trang. |
 
 Nhờ vậy sau khi compile bạn biết ngay báo cáo có vừa giới hạn hay không, thay vì mở trình đọc
 PDF đếm thủ công.

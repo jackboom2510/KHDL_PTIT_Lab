@@ -33,9 +33,18 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   │   ├── answers_homework.sql # BỔ SUNG — S16–S21
 │   │   └── explain.sql        # EXPLAIN trước/sau index (S15, S20)
 │   ├── data/                  # sales.db, sales_extended.db (sinh tự động, không commit)
+│   ├── evidence/              # pipeline sinh ảnh minh chứng (chạy riêng)
+│   │   ├── make_evidence.py   # sinh 7 ảnh PNG từ output thật
+│   │   ├── scenes.py          # khai báo 7 scene (tên khớp phụ lục báo cáo)
+│   │   ├── runner.py          # chạy lệnh trên bản sao CSDL trong data/.evidence
+│   │   ├── render.py          # vẽ khung terminal -> PNG (Pillow + fallback font)
+│   │   └── manifest.json      # ảnh nào sinh từ lệnh nào
+│   ├── pack_submission.sh     # đóng gói submission/StudentID_SQL.zip
 │   ├── report/                # báo cáo LaTeX + PDF
 │   │   ├── lab01_report_short.tex # BẢN NỘP: gọn 2–3 trang, 2 cột
 │   │   ├── lab01_report.tex   # bản đầy đủ (9 mục + 4 phụ lục), tham khảo
+│   │   ├── make_pdf.py        # xuất PDF 3 trang bằng Python (không cần TeX)
+│   │   ├── lab01_report_short_pdf.pdf  # bản nộp đã xuất, 3 trang, 6 ảnh minh chứng
 │   │   ├── compile.sh         # bash compile.sh [2p|full|short|check]
 │   │   ├── check_tex.py       # kiểm tra cú pháp LaTeX (không cần TeX)
 │   │   ├── pdf_pages.py       # đếm số trang PDF, cảnh báo nếu > 3
@@ -81,13 +90,34 @@ python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 
 Kiểm tra nhanh dữ liệu mẫu: `customers = 5`, `products = 5`, `orders = 6`, `order_items = 8`.
 
-Báo cáo (LaTeX) — đề yêu cầu **PDF 2–3 trang**:
+### Ảnh minh chứng (pipeline riêng) và báo cáo PDF
+
+```bash
+cd lab01_sql/evidence
+pip install -r requirements.txt     # chỉ Pillow
+python3 make_evidence.py            # 7 ảnh PNG -> ../evidence/
+python3 make_evidence.py --only 05_explain_before_after   # sinh lại 1 ảnh
+python3 make_evidence.py --from-log # render lại từ log, không chạy lệnh
+```
 
 ```bash
 cd lab01_sql/report
-bash compile.sh            # = 2p: bản nộp 2–3 trang (tự kiểm tra số trang sau compile)
-bash compile.sh full       # bản đầy đủ có phụ lục (~10 trang), để tham khảo
-bash compile.sh check      # chỉ kiểm tra cú pháp LaTeX
+pip install -r ../evidence/requirements.txt   # fpdf2 + pillow
+python3 make_pdf.py                 # -> lab01_report_short_pdf.pdf (3 trang, có ảnh)
+bash compile.sh                     # (tuỳ chọn) bản LaTeX 2–3 trang nếu máy có TeX
+bash compile.sh full                # bản đầy đủ có phụ lục (~10 trang)
+```
+
+Pipeline ảnh **tách riêng** khỏi luồng dữ liệu: nó dựng CSDL trên bản sao trong
+`data/.evidence/` (gitignore), nên ảnh luôn ở trạng thái sạch và không làm thay đổi `sales.db`.
+
+### Đóng gói nộp bài
+
+```bash
+bash lab01_sql/pack_submission.sh 22CNTT0123
+# -> submission/22CNTT0123_SQL.zip: data/sales.db, sql_console.py, sql/answers.sql (S01–S15),
+#    sql/answers_homework.sql (S16–S21), sql/explain.sql, generator, report PDF 3 trang,
+#    7 ảnh minh chứng, README_MAPPING.txt ánh xạ yêu cầu -> file.
 ```
 
 Cần TeX Live có `vntex`/`babel-vietnamese`; hoặc upload thư mục `report/` lên Overleaf và chọn

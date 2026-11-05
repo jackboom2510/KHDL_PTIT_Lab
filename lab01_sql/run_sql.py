@@ -83,6 +83,12 @@ def main() -> int:
     args = parser.parse_args()
 
     db_path = args.db if args.db.is_absolute() else (BASE / args.db)
+    if not db_path.exists() and args.db == DEFAULT_DB:
+        # Bài nộp có thể đặt sales.db ngay cạnh script thay vì trong data/
+        for alt in (BASE / "sales.db", BASE / "data" / "sales.db"):
+            if alt.exists():
+                db_path = alt
+                break
     if not db_path.exists():
         print(f"Không thấy {db_path}. Chạy: python3 build_db.py")
         return 1
