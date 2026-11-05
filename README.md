@@ -33,8 +33,8 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   │   ├── answers_homework.sql # BỔ SUNG — S16–S21
 │   │   └── explain.sql        # EXPLAIN trước/sau index (S15, S20)
 │   ├── data/                  # sales.db, sales_extended.db (sinh tự động, không commit)
-│   ├── evidence/              # ảnh chụp minh chứng (7 PNG, chụp trên Cloud Shell)
-│   │   ├── HUONG_DAN_CHUP_ANH.md  # 7 ảnh: lệnh cần chạy, nội dung cần thấy
+│   ├── evidence/              # ảnh chụp minh chứng (11 PNG, chụp trên Cloud Shell)
+│   │   ├── HUONG_DAN_CHUP_ANH.md  # 7 nhóm ảnh: lệnh cần chạy, nội dung cần thấy
 │   │   └── capture_commands.sh    # in/chạy lần lượt các lệnh để chụp
 │   ├── pack_submission.sh     # đóng gói submission/StudentID_SQL.zip
 │   ├── report/                # báo cáo PDF 4–5 trang, đen trắng
@@ -90,18 +90,18 @@ bằng script. Danh sách lệnh cần chạy và nội dung cần thấy của 
 
 ```bash
 cd lab01_sql/evidence
-cat HUONG_DAN_CHUP_ANH.md               # 7 ảnh: lệnh, kết quả kỳ vọng, lưu ý che thông tin
+cat HUONG_DAN_CHUP_ANH.md               # 7 nhóm ảnh: lệnh, kết quả kỳ vọng, lưu ý che thông tin
 bash capture_commands.sh                # in lần lượt 7 nhóm lệnh
 bash capture_commands.sh --only 05      # chỉ nhóm lệnh của ảnh 05
 bash capture_commands.sh --run          # chạy luôn chứ không chỉ in
-# lưu ảnh theo đúng tên: 01_env.png … 07_s19_rank.png
+# lưu ảnh theo đúng tên: 01_env.png … 07_s19_rank_03.png (nhóm dài chụp nhiều ảnh _01, _02)
 ```
 
 ```bash
 cd lab01_sql/report
 pip install -r requirements.txt         # fpdf2 + pillow
 python3 make_report.py                  # báo cáo 4 trang (chưa chèn ảnh)
-python3 make_report.py --images ../evidence   # chèn 7 ảnh thật -> 5 trang
+python3 make_report.py --images ../evidence   # chèn 11 ảnh thật -> 5 trang
 ```
 
 Báo cáo ngắn 4–5 trang, đen trắng, tổ chức theo 5 tiêu chí chấm; tự thu nhỏ ảnh nếu vượt 5
@@ -113,7 +113,7 @@ trang. Chi tiết: [`lab01_sql/report/README.md`](lab01_sql/report/README.md).
 bash lab01_sql/pack_submission.sh 22CNTT0123
 # -> submission/22CNTT0123_SQL.zip: data/sales.db, sql_console.py, sql/answers.sql (S01–S15),
 #    sql/answers_homework.sql (S16–S21), sql/explain.sql, generator, report PDF 4–5 trang,
-#    7 ảnh minh chứng, README_MAPPING.txt ánh xạ yêu cầu -> file.
+#    11 ảnh minh chứng, README_MAPPING.txt ánh xạ yêu cầu -> file.
 ```
 
 Không cần TeX: PDF sinh bằng Python (fpdf2). `answers.sql` chạy lại nhiều lần vẫn sạch: S05 chỉ nhân 10% khi Mouse còn ở giá gốc 250.000,

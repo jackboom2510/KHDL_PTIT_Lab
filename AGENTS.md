@@ -46,7 +46,7 @@ SQLite) và LAB 02 (NoSQL trên MongoDB Atlas). Hai đề bài gốc nằm ở t
 │   │   └── explain.sql        # EXPLAIN QUERY PLAN trước/sau index (S15, S20)
 │   ├── data/                  # sales.db, sales_extended.db — sinh tự động, KHÔNG commit
 │   ├── report/                # báo cáo PDF ngắn 4–5 trang (make_report.py, đen trắng)
-│   └── evidence/              # 7 ảnh chụp thật trên Cloud Shell + hướng dẫn chụp
+│   └── evidence/              # 11 ảnh chụp thật trên Cloud Shell + hướng dẫn chụp
 ├── lab02_nosql/
 │   ├── AGENTS.md              # quy ước riêng LAB 02
 │   ├── connect.py             # kết nối Atlas qua getpass (bắt buộc nộp)
@@ -87,8 +87,8 @@ Lý do: mỗi phần có dữ liệu và cách chạy khác nhau (mẫu vs mở 
 
 - [ ] Chạy lại từ repo sạch tạo được CSDL/dữ liệu không lỗi.
 - [ ] Tất cả câu S01–S21 (hoặc N01–N22) có trong file đáp án, đúng mã, có kết quả chạy được.
-- [ ] Có ảnh minh chứng **chụp thật** trong `evidence/` (LAB 01: đủ 7 ảnh `01_env.png` …
-      `07_s19_rank.png`), không dùng ảnh dựng lại bằng script.
+- [ ] Có ảnh minh chứng **chụp thật** trong `evidence/` (LAB 01: 7 nhóm / 11 tệp,
+      `01_env.png` … `07_s19_rank_03.png`), không dùng ảnh dựng lại bằng script.
 - [ ] Báo cáo ngắn 4–5 trang trong `report/`, đen trắng, theo tiêu chí chấm; nêu kết quả +
       nhận xét, không dán cả file code.
 - [ ] `README.md` cập nhật lệnh chạy mới nếu có.

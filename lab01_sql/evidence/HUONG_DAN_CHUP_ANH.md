@@ -4,18 +4,19 @@ Mục đích: ảnh minh chứng phải là ảnh chụp màn hình **thật** k
 https://shell.cloud.google.com, không phải ảnh dựng lại. Tài liệu này liệt kê đúng lệnh cần
 chạy và nội dung cần thấy trong từng ảnh.
 
-Bài nộp cần 7 ảnh, đặt trong `lab01_sql/evidence/` với tên tệp như bảng dưới. Tên tệp khớp với
-danh mục ảnh trong báo cáo (`report/make_report.py`).
+Bài nộp cần 7 nhóm ảnh (11 tệp), đặt trong `lab01_sql/evidence/` với tên tệp như bảng dưới.
+Nhóm nào dài hơn một màn hình thì chụp thành nhiều ảnh, thêm hậu tố `_01`, `_02`, `_03`; tên tệp
+khớp danh mục ảnh ở mục 7 của báo cáo (`report/make_report.py`).
 
 | Tệp | Nội dung ảnh | Mục trong báo cáo |
 | --- | --- | --- |
 | `01_env.png` | `whoami`, `pwd`, phiên bản Python và SQLite | 2 — Tiêu chí 1 (cài đặt, dữ liệu) |
 | `02_tables_count.png` | Tạo 4 bảng + số dòng 5/5/6/8 + `foreign_key_check` | 2 — Tiêu chí 1 (cài đặt, dữ liệu) |
 | `03_console.png` | `sql_console.py`: câu lệnh nhiều dòng, một câu sai, `EXIT` | 3 — Tiêu chí 2 (CRUD) |
-| `04_s08_result.png` | Kết quả S08 và S09 | 4 — Tiêu chí 3 (truy vấn nâng cao) |
-| `05_explain_before_after.png` | `EXPLAIN QUERY PLAN` trước và sau index | 5 — Tiêu chí 4 (index) |
+| `04_s08_result_01.png`, `_02.png` | `answers.sql`: S01–S04 và S09–S12 | 4 — Tiêu chí 3 (truy vấn nâng cao) |
+| `05_explain_before_after_01.png`, `_02.png` | `EXPLAIN QUERY PLAN` trước/sau index, cả trên dữ liệu lớn | 5 — Tiêu chí 4 (index) |
 | `06_expanded_counts.png` | Sinh dữ liệu mở rộng 100/30/500/1500 | 6 — Tiêu chí 5 (mở rộng) |
-| `07_s19_rank.png` | S19 với cột `rank` và `dense_rank` | 6 — Tiêu chí 5 (mở rộng) |
+| `07_s19_rank_01.png`, `_02.png`, `_03.png` | S16–S17, S18–S20, S21 + bảng tạm | 6 — Tiêu chí 5 (mở rộng) |
 
 ---
 
@@ -103,7 +104,7 @@ câu sai (console không bị thoát), và thoát bằng `EXIT`.
 
 ---
 
-## Ảnh 4 — `04_s08_result.png` (truy vấn nâng cao)
+## Ảnh 4 — `04_s08_result_01.png`, `_02.png` (truy vấn nâng cao)
 
 ```bash
 python3 run_sql.py sql/answers.sql
@@ -123,7 +124,7 @@ GROUP BY o.order_id ORDER BY total DESC;"
 
 ---
 
-## Ảnh 5 — `05_explain_before_after.png` (index và giải thích)
+## Ảnh 5 — `05_explain_before_after_01.png`, `_02.png` (index và giải thích)
 
 ```bash
 python3 run_sql.py sql/explain.sql
@@ -154,7 +155,7 @@ Cần thấy: 100 khách hàng, 30 sản phẩm, 500 đơn, 1500 dòng đơn và
 
 ---
 
-## Ảnh 7 — `07_s19_rank.png` (xếp hạng, window function)
+## Ảnh 7 — `07_s19_rank_01.png` … `_03.png` (xếp hạng, window function, S21)
 
 ```bash
 python3 run_sql.py sql/answers_homework.sql --db data/sales_extended.db
@@ -167,7 +168,7 @@ Chụp đoạn **S19**: bảng có 4 cột `customer_id`, `name`, `revenue`, `ra
 
 ## Sau khi chụp xong
 
-1. Đưa 7 ảnh vào `lab01_sql/evidence/` đúng tên tệp ở bảng đầu tài liệu.
+1. Đưa ảnh vào `lab01_sql/evidence/` đúng tên tệp ở bảng đầu tài liệu (nhóm dài: `_01`, `_02`, `_03`).
 2. Kiểm tra danh sách:
 
    ```bash

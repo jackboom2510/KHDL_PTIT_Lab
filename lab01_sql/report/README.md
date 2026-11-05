@@ -9,7 +9,7 @@ lục, không chương, không phụ lục).
 | `make_report.py` | Sinh báo cáo PDF. Tự kiểm tra số trang và trả mã lỗi nếu > 5 trang |
 | `requirements.txt` | `fpdf2`, `pillow` (và tuỳ chọn `pypdfium2` để đếm trang) |
 | `pdf_pages.py` | Đếm số trang PDF (dùng nội bộ trong `make_report.py`) |
-| `BaoCao_LAB01_B23DCKH105.pdf` | Bản đã xuất, **4 trang** khi chưa chèn ảnh, **5 trang** khi chèn đủ 7 ảnh |
+| `BaoCao_LAB01_B23DCKH105.pdf` | Bản đã xuất, **4 trang** khi chưa chèn ảnh, **5 trang** khi chèn đủ 11 ảnh |
 
 ## Xuất báo cáo
 
@@ -17,14 +17,14 @@ lục, không chương, không phụ lục).
 cd lab01_sql/report
 pip install -r requirements.txt
 
-python3 make_report.py                       # bản chữ, 4 trang
-python3 make_report.py --images ../evidence  # chèn 7 ảnh chụp thật, 5 trang
-python3 make_report.py --images ../evidence --out /tmp/bao-cao.pdf
+python3 make_report.py                 # bản chữ, 4 trang
+python3 make_report.py --images evidence   # chèn ảnh chụp thật (11 tệp), 5 trang
+python3 make_report.py --images evidence --out /tmp/bao-cao.pdf
 ```
 
-`--images` trỏ tới thư mục chứa 7 ảnh (`01_env.png` … `07_s19_rank.png`) và chỉ chèn những
-ảnh có mặt; thiếu ảnh nào thì in cảnh báo nhưng vẫn xuất PDF. Nếu thiếu ảnh, mục 7 của báo
-cáo vẫn liệt kê danh mục ảnh cần nộp.
+`--images` trỏ tới thư mục chứa ảnh (đường dẫn được tìm lần lượt từ thư mục hiện tại, từ
+`report/`, từ `lab01_sql/` và từ gốc repo). Danh sách 11 tệp nằm ở hằng số `FIGURES`; thiếu ảnh
+nào thì in cảnh báo nhưng vẫn xuất PDF, và mục 7 luôn liệt kê danh mục ảnh cần nộp.
 
 ## Bố cục và quy ước trình bày
 
@@ -45,7 +45,7 @@ icon, không bullet ký tự đặc biệt (gạch đầu dòng là dấu `-`). 
 Ảnh chụp Cloud Shell rất "tốn" chiều cao trang, nên `make_report.py`:
 
 - đặt hai ảnh cạnh nhau khi hai ảnh cùng một tiêu chí (`figure_pair`), ảnh lẻ thu nhỏ tối đa
-  44 mm chiều cao;
+  42–46 mm chiều cao; ảnh rộng như `01_env.png` được để full chiều ngang cho dễ đọc;
 - nếu vẫn vượt 5 trang thì tự giảm tỉ lệ ảnh 1,0 → 0,9 → 0,8 → 0,7 → 0,6 và xuất lại;
 - thoát với mã lỗi 1 và in cảnh báo nếu sau tất cả các lần thử vẫn > 5 trang.
 
