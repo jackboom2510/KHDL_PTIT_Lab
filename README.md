@@ -43,7 +43,9 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   ├── report/                # báo cáo LaTeX + PDF
 │   │   ├── lab01_report_short.tex # BẢN NỘP: gọn 2–3 trang, 2 cột
 │   │   ├── lab01_report.tex   # bản đầy đủ (9 mục + 4 phụ lục), tham khảo
-│   │   ├── make_pdf.py        # xuất PDF 3 trang bằng Python (không cần TeX)
+│   │   ├── make_report.py     # báo cáo ĐỒ ÁN đầy đủ 37 trang (bìa, mục lục, 6 chương)
+│   │   ├── BaoCaoDoAn_LAB01_NguyenDanhThai_B23DCKH105.pdf
+│   │   ├── make_pdf.py        # bản tóm tắt 3 trang (không cần TeX)
 │   │   ├── lab01_report_short_pdf.pdf  # bản nộp đã xuất, 3 trang, 6 ảnh minh chứng
 │   │   ├── compile.sh         # bash compile.sh [2p|full|short|check]
 │   │   ├── check_tex.py       # kiểm tra cú pháp LaTeX (không cần TeX)
@@ -103,7 +105,8 @@ python3 make_evidence.py --from-log # render lại từ log, không chạy lện
 ```bash
 cd lab01_sql/report
 pip install -r ../evidence/requirements.txt   # fpdf2 + pillow
-python3 make_pdf.py                 # -> lab01_report_short_pdf.pdf (3 trang, có ảnh)
+python3 make_report.py              # -> báo cáo đồ án đầy đủ (37 trang, bìa + mục lục)
+python3 make_pdf.py                 # -> bản tóm tắt 3 trang (có ảnh)
 bash compile.sh                     # (tuỳ chọn) bản LaTeX 2–3 trang nếu máy có TeX
 bash compile.sh full                # bản đầy đủ có phụ lục (~10 trang)
 ```

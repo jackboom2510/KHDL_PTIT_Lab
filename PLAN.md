@@ -73,7 +73,10 @@ chứng minh index ở `sql/explain.sql`. Chi tiết kết quả đã kiểm ch�
 - [x] Xuất PDF 3 trang bằng `report/make_pdf.py` (fpdf2 + DejaVu, **không cần TeX**), có 6 ảnh minh chứng.
 - [x] Pipeline ảnh tách riêng `evidence/`: 7 ảnh PNG sinh từ output thật (`make_evidence.py`).
 - [x] `pack_submission.sh` đóng `submission/StudentID_SQL.zip`, đã giải nén và chạy lại độc lập.
-- [ ] Điền tên/MSSV/lớp (trang đầu PDF và `pack_submission.sh <MSSV>`).
+- [x] Báo cáo đồ án đầy đủ 37 trang (`report/make_report.py`): bìa có tên **Nguyễn Danh Thái —
+      B23DCKH105**, mục lục, danh mục từ viết tắt/hình/bảng, 6 chương, tham khảo, phụ lục A–C.
+- [ ] Điền tên lớp và giảng viên hướng dẫn (hằng số `CLASS_NAME`, `INSTRUCTOR` trong
+      `make_report.py`), rồi chạy lại để cập nhật cả bìa lẫn PDF.
 - [ ] (Tuỳ chọn) chụp lại ảnh 01_env trên Cloud Shell thật nếu giảng viên yêu cầu ảnh terminal gốc.
 
 ### 1.4 Nộp
