@@ -49,7 +49,7 @@ fi
 # --- ảnh minh chứng (ảnh chụp thật trên Google Cloud Shell) ---
 if [[ -z "$(ls -A evidence/*.png 2>/dev/null)" ]]; then
   echo "[!] Chưa có ảnh minh chứng — xem evidence/HUONG_DAN_CHUP_ANH.md," >&2
-  echo "    chụp 7 ảnh 01_env.png … 07_s19_rank.png rồi chạy lại." >&2
+  echo "    chụp 11 ảnh 01_env.png … 07_s19_rank_03.png rồi chạy lại." >&2
 fi
 cp evidence/*.png "$ROOT/evidence/" 2>/dev/null || true
 
@@ -70,7 +70,7 @@ Ngày đóng gói: $(date +%F)
   run_sql.py ............... chạy file .sql bằng Python khi máy không có sqlite3 CLI
   data/sales_extended.db ... dữ liệu mở rộng (dùng cho S16–S21)
   report/*_report.pdf ...... báo cáo 4–5 trang theo 5 tiêu chí chấm, có ảnh minh chứng
-  evidence/*.png ........... 7 ảnh chụp thật trên Google Cloud Shell (xem mục 7 báo cáo)
+  evidence/*.png ........... 11 ảnh chụp thật trên Google Cloud Shell (xem mục 7 báo cáo)
 
 CHẠY LẠI
   python3 build_db.py --force

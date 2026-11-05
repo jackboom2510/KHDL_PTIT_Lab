@@ -8,7 +8,7 @@
 
     pip install -r requirements.txt          # fpdf2 + pillow
     python3 make_report.py                    # bản 4–5 trang, không chèn ảnh
-    python3 make_report.py --images ../evidence
+    python3 make_report.py --images evidence
                                               # chèn ảnh minh chứng thật đã chụp
     python3 make_report.py --out /tmp/x.pdf
 
@@ -43,6 +43,15 @@ LH = 5.4
 INDENT = 7.0
 INK = (0, 0, 0)          # chỉ dùng màu đen
 GRAY = (90, 90, 90)      # xám trung tính cho chú thích ảnh, không phải màu nhấn
+
+
+FIGURES = [
+    "01_env.png", "02_tables_count.png", "03_console.png",
+    "04_s08_result_01.png", "04_s08_result_02.png",
+    "05_explain_before_after_01.png", "05_explain_before_after_02.png",
+    "06_expanded_counts.png", "07_s19_rank_01.png",
+    "07_s19_rank_02.png", "07_s19_rank_03.png",
+]
 
 
 def ascii_only(text: str) -> str:
@@ -312,18 +321,15 @@ def title_block(r: Report) -> None:
 
 def section1(r: Report) -> None:
     r.h1("1. Thông tin chung")
-    r.p("Bài thực hành xây dựng cơ sở dữ liệu quan hệ bán hàng trực tuyến gồm bốn bảng trên "
-        "SQLite, thực hiện các thao tác CRUD, truy vấn nhiều bảng, tổng hợp, truy vấn con, hàm "
-        "cửa sổ, sau đó tạo chỉ mục và phân tích kế hoạch thực thi. Toàn bộ 21 yêu cầu của đề "
-        "bài (S01–S21) đã được cài đặt và chạy kiểm chứng.")
+    r.p("Bài thực hành xây dựng cơ sở dữ liệu bán hàng trực tuyến gồm bốn bảng trên SQLite, thực "
+        "hiện CRUD, truy vấn nhiều bảng, tổng hợp, truy vấn con, hàm cửa sổ, rồi tạo chỉ mục và "
+        "phân tích kế hoạch thực thi. Toàn bộ 21 yêu cầu S01–S21 đã cài đặt và chạy kiểm chứng.")
     r.items([
-        "Môi trường: Google Cloud Shell, Python 3 (thư viện chuẩn sqlite3), SQLite dạng tệp; "
-        "không dùng dịch vụ tính phí.",
-        "Dữ liệu mẫu của đề bài: 5 khách hàng, 5 sản phẩm, 6 đơn hàng, 8 dòng đơn hàng.",
-        "Phần bắt buộc S01–S15 nằm trong sql/answers.sql, chạy trên data/sales.db; phần bổ sung "
-        "S16–S21 nằm trong sql/answers_homework.sql, chạy trên data/sales_extended.db.",
-        "Kịch bản hỗ trợ: build_db.py (tạo cơ sở dữ liệu), generate_data.py (sinh dữ liệu mở "
-        "rộng), run_sql.py (chạy tệp .sql), sql_console.py (console tương tác).",
+        "Môi trường: Google Cloud Shell, Python 3.12.3, SQLite 3.45.1 (thư viện chuẩn sqlite3, "
+        "cơ sở dữ liệu dạng tệp); không dùng dịch vụ tính phí.",
+        "Phần bắt buộc S01–S15: sql/answers.sql trên data/sales.db (dữ liệu mẫu 5/5/6/8). Phần "
+        "bổ sung S16–S21: sql/answers_homework.sql trên data/sales_extended.db.",
+        "Kịch bản hỗ trợ: build_db.py, generate_data.py, run_sql.py, sql_console.py.",
     ])
 
 
@@ -354,14 +360,16 @@ def criterion1(r: Report) -> None:
     r.p("Sau khi nạp, PRAGMA foreign_key_check trả về rỗng, nghĩa là mọi khoá ngoại đều trỏ tới "
         "bản ghi tồn tại. Kịch bản build_db.py in trực tiếp bảng đối chiếu trên nên việc kiểm "
         "tra không phụ thuộc vào thao tác thủ công; ảnh chụp màn hình tương ứng nằm ở mục 7.")
-    r.figure_pair(("01_env.png", "Môi trường thực hành trên Google Cloud Shell"),
-                  ("02_tables_count.png", "Tạo bốn bảng, kiểm tra số dòng và khoá ngoại"))
+    r.figure("01_env.png", "Môi trường thực hành: tài khoản, thư mục, Python và SQLite",
+             max_h=44, max_w=150)
+    r.figure("02_tables_count.png", "Tạo bốn bảng: số dòng 5/5/6/8 và foreign_key_check rỗng",
+             max_h=46, max_w=120)
 
 
 def criterion2(r: Report) -> None:
     r.h1("3. Tiêu chí 2 — CRUD và câu cơ bản (2,0 điểm)")
-    r.p("Nhóm S01–S07 gồm ba truy vấn đọc và bốn thao tác có ghi. Các thao tác ghi được viết để "
-        "tệp đáp án chạy lặp an toàn, tránh việc chạy lại làm sai dữ liệu.")
+    r.p("Nhóm S01–S07 gồm ba truy vấn đọc và bốn thao tác có ghi; các thao tác ghi được viết để "
+        "tệp đáp án chạy lặp an toàn.")
     r.table(["Mã", "Nội dung", "Cách thực hiện", "Kết quả"],
             [["S01", "Tên và thành phố khách hàng", "SELECT, ORDER BY", "5 dòng"],
              ["S02", "Sản phẩm giá trên 1 triệu", "WHERE price > 1000000", "2 dòng"],
@@ -371,24 +379,22 @@ def criterion2(r: Report) -> None:
              ["S06", "Xoá khách vừa thêm", "DELETE + NOT EXISTS", "1 dòng"],
              ["S07", "Mã đơn và tên khách hàng", "INNER JOIN", "6 dòng"]],
             [12, 62, 48, 20], "Các câu S01–S07 và kết quả thực tế", aligns="LLLR")
+    r.figure("03_console.png", "sql_console.py: câu nhiều dòng, GROUP BY, một lỗi SQL, EXIT",
+             max_h=42, max_w=100)
     r.items([
-        "S04 dùng INSERT … ON CONFLICT(customer_id) DO NOTHING nên chạy lại không báo lỗi trùng "
-        "khoá chính.",
-        "S05 dùng UPDATE … WHERE product_id = 102 AND price = 250000; lần chạy thứ hai không còn "
-        "khớp dòng nào (Rows affected: 0) nên giá giữ nguyên 275.000 thay vì bị nhân 10% lần nữa.",
-        "S06 dùng DELETE … AND NOT EXISTS (SELECT 1 FROM orders …), vừa đúng ngữ nghĩa “khách vừa "
-        "thêm chưa có đơn”, vừa không vi phạm khoá ngoại. Sau hai lần chạy: 5 khách hàng, giá "
-        "Mouse 275.000.",
+        "S04 dùng INSERT … ON CONFLICT(customer_id) DO NOTHING; S05 dùng UPDATE … WHERE "
+        "product_id = 102 AND price = 250000 nên lần chạy thứ hai không khớp dòng nào (Rows "
+        "affected: 0) và giá giữ 275.000 thay vì nhân 10% lần nữa.",
+        "S06 dùng DELETE … AND NOT EXISTS (SELECT 1 FROM orders …) — đúng nghĩa “khách vừa thêm "
+        "chưa có đơn”, không vi phạm khoá ngoại. Sau hai lần chạy vẫn 5 khách hàng.",
     ])
-    r.figure("03_console.png", "Console SQL: câu lệnh nhiều dòng, thông báo lỗi và thoát",
-             max_h=44, max_w=104)
 
 
 def criterion3(r: Report) -> None:
     r.h1("4. Tiêu chí 3 — Truy vấn nâng cao (3,0 điểm)")
-    r.p("S08 nối ba bảng để tính tổng tiền từng đơn; S09 gom theo khách hàng; S10 lọc theo kết "
-        "quả tổng hợp bằng HAVING; S11 dùng truy vấn con vô hướng; S12 đếm số đơn; S13 lấy top 3 "
-        "theo doanh thu.")
+    r.p("S08 nối ba bảng tính tổng tiền từng đơn; S09 gom theo khách hàng; S10 lọc kết quả tổng "
+        "hợp bằng HAVING; S11 dùng truy vấn con vô hướng; S12 đếm số đơn; S13 lấy top 3 theo "
+        "doanh thu.")
     r.code(
         "SELECT o.order_id, SUM(i.quantity * p.price) AS total\n"
         "FROM orders o\n"
@@ -406,22 +412,20 @@ def criterion3(r: Report) -> None:
              ["Tổng", "44.125.000", "—", "—"]],
             [22, 40, 40, 38], "Kết quả S08 (hai cột đầu) và S09 (hai cột sau)", aligns="LRlR")
     r.items([
-        "Kiểm tra chéo đơn 1001: 1 Laptop 15.000.000 + 2 Mouse 275.000 = 15.550.000, khớp kết quả "
-        "máy. Giá dùng ở đây là 275.000 vì S05 đã chạy trước S08.",
+        "Kiểm tra chéo đơn 1001: 1 Laptop 15.000.000 + 2 Mouse 275.000 = 15.550.000, khớp kết "
+        "quả máy (giá 275.000 vì S05 chạy trước S08).",
         "S10 trả về 3 khách vượt 5 triệu (An, Chi, Ha); S11 chỉ Laptop vượt giá trung bình "
-        "4.045.000; S12 đúng 1 khách (An, 2 đơn); S13 top 3 là Laptop 30.000.000, Monitor "
+        "4.045.000; S12 đúng 1 khách (An, 2 đơn); S13 top 3: Laptop 30.000.000, Monitor "
         "10.500.000, Headphones 1.600.000.",
-        "S16 doanh thu theo tháng (13 nhóm tháng); S17 8 khách chưa có đơn; S18 4 sản phẩm chưa "
-        "bán; S19 top 3 khách là Ha 314.565.000, Ho Mai 281.910.000, Hoang Chi 267.400.000.",
     ])
-    r.figure("04_s08_result.png", "Kết quả S08 và S09 khi chạy sql/answers.sql",
-             max_h=44, max_w=104)
+    r.figure_pair(("04_s08_result_01.png", "Chạy sql/answers.sql: kết quả S01–S04"),
+                  ("04_s08_result_02.png", "S09–S12: gom nhóm, HAVING, truy vấn con, đếm đơn"))
 
 
 def criterion4(r: Report) -> None:
     r.h1("5. Tiêu chí 4 — Index và giải thích (1,5 điểm)")
-    r.p("Yêu cầu S15 cần so sánh kế hoạch trước và sau khi có chỉ mục, nên sql/explain.sql tự "
-        "xoá chỉ mục, chạy EXPLAIN, tạo chỉ mục rồi chạy EXPLAIN lần hai.")
+    r.p("S15 cần so sánh kế hoạch trước và sau khi có chỉ mục, nên sql/explain.sql tự xoá chỉ "
+        "mục, chạy EXPLAIN, tạo chỉ mục rồi chạy EXPLAIN lần hai (S20 lặp lại trên dữ liệu lớn).")
     r.code(
         "DROP INDEX IF EXISTS idx_orders_customer;\n"
         "EXPLAIN QUERY PLAN SELECT order_id FROM orders WHERE customer_id = 1;\n"
@@ -433,22 +437,21 @@ def criterion4(r: Report) -> None:
               "SEARCH orders USING COVERING INDEX idx_orders_customer (customer_id=?)"]],
             [40, 105], "Kế hoạch thực thi trước và sau khi tạo chỉ mục", aligns="LL")
     r.items([
-        "SCAN là đọc tuần tự toàn bảng rồi lọc, chi phí tăng theo số dòng của bảng; SEARCH là đi "
-        "xuống cây B-tree của chỉ mục nên chi phí tỉ lệ với logarit số dòng cộng số dòng khớp.",
-        "Kế hoạch ghi COVERING INDEX vì câu truy vấn chỉ cần order_id — với bảng có khoá chính "
-        "INTEGER, chỉ mục trên customer_id đã chứa sẵn rowid (chính là order_id), nên SQLite trả "
-        "lời hoàn toàn từ chỉ mục mà không đọc lại bảng.",
-        "Không kết luận bằng thời gian chạy: với 6 dòng, chênh lệch thời gian nằm dưới ngưỡng đo "
-        "của đồng hồ hệ thống, nên phải đọc kế hoạch thực thi thay vì đo thời gian.",
+        "SCAN đọc tuần tự toàn bảng rồi lọc nên chi phí tăng theo số dòng; SEARCH đi xuống cây "
+        "B-tree của chỉ mục nên chi phí tỉ lệ với logarit số dòng cộng số dòng khớp.",
+        "Kế hoạch ghi COVERING INDEX vì truy vấn chỉ cần order_id — với khoá chính INTEGER, chỉ "
+        "mục trên customer_id đã chứa sẵn rowid nên không phải đọc lại bảng. Với 6 dòng, chênh "
+        "lệch thời gian dưới ngưỡng đo, nên kết luận dựa trên kế hoạch thực thi.",
     ])
-    r.figure("05_explain_before_after.png",
-             "EXPLAIN QUERY PLAN trước và sau khi tạo chỉ mục", max_h=44, max_w=104)
+    r.figure_pair(("05_explain_before_after_01.png", "sales.db: SCAN orders trước và sau index"),
+                  ("05_explain_before_after_02.png",
+                   "S20.2–S20.3: SEARCH … USING INDEX trên dữ liệu lớn"))
 
 
 def criterion5(r: Report) -> None:
     r.h1("6. Tiêu chí 5 — Bài mở rộng và báo cáo (1,5 điểm)")
-    r.p("Dữ liệu mở rộng được sinh bằng generate_data.py với random.seed(2026) nên tái lập được, "
-        "ghi vào tệp riêng data/sales_extended.db, không ghi đè dữ liệu mẫu.")
+    r.p("Dữ liệu mở rộng sinh bằng generate_data.py với random.seed(2026) nên tái lập được, ghi "
+        "vào tệp riêng data/sales_extended.db, không ghi đè dữ liệu mẫu.")
     r.table(["Đối tượng", "Yêu cầu tối thiểu", "Thực tế"],
             [["Khách hàng", "100", "100"],
              ["Sản phẩm", "30", "30"],
@@ -456,20 +459,21 @@ def criterion5(r: Report) -> None:
              ["Dòng đơn hàng", "1.000", "1.500"]],
             [52, 48, 45], "Quy mô dữ liệu mở rộng so với yêu cầu của đề", aligns="LRR")
     r.items([
-        "S16: doanh thu theo tháng bằng strftime('%Y-%m', order_date), 13 nhóm tháng từ 10/2025 "
-        "đến 10/2026; cao nhất 2025-10 với 1.142.485.000 đồng; tháng cuối chỉ 7 đơn vì dữ liệu "
-        "kết thúc giữa tháng.",
-        "S17 khách chưa có đơn (LEFT JOIN … IS NULL): 8 khách; S18 sản phẩm chưa từng bán "
+        "S16 doanh thu theo tháng bằng strftime('%Y-%m', order_date): 13 nhóm từ 10/2025 đến "
+        "10/2026, cao nhất 2025-10 với 1.142.485.000 đồng; tháng cuối chỉ 7 đơn vì dữ liệu kết "
+        "thúc giữa tháng.",
+        "S17 khách chưa có đơn (LEFT JOIN … IS NULL): 8 khách. S18 sản phẩm chưa từng bán "
         "(NOT EXISTS): 4 sản phẩm.",
-        "S19 xếp hạng bằng RANK và DENSE_RANK; dữ liệu không có đồng hạng nên hai cột trùng nhau, "
-        "khi có đồng hạng RANK cho 2, 2, 4 còn DENSE_RANK cho 2, 2, 3.",
-        "S20 trên dữ liệu lớn: chưa có chỉ mục là SCAN orders, có chỉ mục là SEARCH orders USING "
-        "INDEX kèm USE TEMP B-TREE FOR ORDER BY do sắp xếp theo order_date.",
-        "S21: SQL Server có #t (bảng tạm cục bộ theo session), ##t (bảng tạm toàn cục) và tempdb "
-        "dùng chung; SQLite chỉ có TEMP TABLE gắn với kết nối, không có bảng tạm toàn cục.",
+        "S19 xếp hạng bằng RANK và DENSE_RANK; dữ liệu không có đồng hạng nên hai cột trùng "
+        "nhau, khi có đồng hạng RANK cho 2, 2, 4 còn DENSE_RANK cho 2, 2, 3.",
+        "S20 trên dữ liệu lớn: SEARCH orders USING INDEX kèm USE TEMP B-TREE FOR ORDER BY do "
+        "sắp xếp theo order_date. S21: SQL Server có #t (session), ##t (toàn cục) và tempdb; "
+        "SQLite chỉ có TEMP TABLE gắn với kết nối.",
     ])
-    r.figure_pair(("06_expanded_counts.png", "Sinh dữ liệu mở rộng và kiểm tra khoá ngoại"),
-                  ("07_s19_rank.png", "Kết quả S19 với RANK và DENSE_RANK"))
+    r.figure_pair(("06_expanded_counts.png", "Sinh dữ liệu mở rộng: 100/30/500/1500 dòng"),
+                  ("07_s19_rank_01.png", "S16 doanh thu 13 tháng và S17 khách chưa có đơn"))
+    r.figure_pair(("07_s19_rank_02.png", "S18 bốn sản phẩm chưa bán, S19 RANK/DENSE_RANK, S20"),
+                  ("07_s19_rank_03.png", "S21 TEMP TABLE và truy vấn tổng hợp trên bảng tạm"))
 
 
 def evidence_list(r: Report) -> None:
@@ -478,29 +482,27 @@ def evidence_list(r: Report) -> None:
         r.p("Toàn bộ ảnh dưới đây được chụp trực tiếp trên Google Cloud Shell và đã chèn vào "
             "đúng mục 2–6 của báo cáo; bảng này để đối chiếu tệp với nội dung minh chứng.")
     else:
-        r.p("Ảnh được chụp trực tiếp trên Google Cloud Shell theo hướng dẫn trong "
-            "evidence/HUONG_DAN_CHUP_ANH.md; tệp lưu trong thư mục evidence với tên như bảng "
-            "dưới. Bản PDF có ảnh được xuất bằng: make_report.py --images ../evidence.")
-    r.table(["Tệp", "Nội dung cần thấy", "Mục"],
-            [["01_env.png", "whoami, pwd, phiên bản Python và SQLite", "2"],
+        r.p("Ảnh được chụp trực tiếp trên Google Cloud Shell và lưu trong thư mục evidence với "
+            "tên như bảng dưới; bản PDF có ảnh được xuất bằng make_report.py --images "
+            "../evidence.")
+    r.table(["Tệp trong evidence/", "Nội dung cần thấy", "Mục"],
+            [["01_env.png", "whoami, pwd, Python 3.12.3, SQLite 3.45.1", "2"],
              ["02_tables_count.png", "Số dòng 5/5/6/8, foreign_key_check rỗng", "2"],
              ["03_console.png", "Console: câu nhiều dòng, một lỗi SQL, EXIT", "3"],
-             ["04_s08_result.png", "Kết quả S08 và S09", "4"],
-             ["05_explain_before_after.png", "SCAN orders → SEARCH … USING INDEX", "5"],
+             ["04_s08_result_01, _02", "Kết quả S01–S04 và S09–S12", "4"],
+             ["05_explain_before_after_01, _02", "SCAN orders → SEARCH … USING INDEX", "5"],
              ["06_expanded_counts.png", "100/30/500/1500 dòng, khoá ngoại hợp lệ", "6"],
-             ["07_s19_rank.png", "Bảng xếp hạng có cột rank và dense_rank", "6"]],
-            [48, 78, 12], "Các ảnh minh chứng cần nộp", aligns="LLR")
+             ["07_s19_rank_01, _02, _03", "S16, S17, S18, S19, S20, S21", "6"]],
+            [50, 76, 12], "Các ảnh minh chứng kèm theo bài nộp", aligns="LLR", size=8.4)
 
 
 def conclusion(r: Report) -> None:
     r.h1("8. Kết luận")
-    r.p("Đã hoàn thành đủ 21 yêu cầu của đề bài: lược đồ bốn bảng có ràng buộc, dữ liệu mẫu đúng "
-        "5/5/6/8 dòng, các nhóm truy vấn từ cơ bản đến nâng cao và phần chỉ mục có phân tích kế "
-        "hoạch thực thi. Các tệp đáp án chạy lặp an toàn; dữ liệu mở rộng vượt mức tối thiểu và "
-        "tái lập được nhờ hạt giống cố định.")
-    r.p("Hai điểm rút ra từ quá trình thực hiện: khoá ngoại của SQLite phải bật bằng PRAGMA "
-        "foreign_keys = ON ở mọi kết nối, và việc đánh giá chỉ mục nên dựa trên kế hoạch thực thi "
-        "thay vì thời gian chạy khi dữ liệu còn nhỏ.")
+    r.p("Đã hoàn thành đủ 21 yêu cầu của đề: lược đồ bốn bảng có ràng buộc, dữ liệu mẫu đúng "
+        "5/5/6/8 dòng, truy vấn từ cơ bản đến nâng cao, chỉ mục có phân tích kế hoạch thực thi; "
+        "các tệp đáp án chạy lặp an toàn và dữ liệu mở rộng tái lập được nhờ hạt giống cố định. "
+        "Hai điểm rút ra: SQLite phải bật PRAGMA foreign_keys = ON ở mọi kết nối, và đánh giá "
+        "chỉ mục nên dựa trên kế hoạch thực thi thay vì thời gian chạy khi dữ liệu còn nhỏ.")
 
 
 def build(out: Path, images: Path | None, fig_scale: float = 1.0) -> Report:
@@ -546,18 +548,20 @@ def main() -> int:
     ap.add_argument("--out", type=Path,
                     default=HERE / f"BaoCao_LAB01_{STUDENT_ID}.pdf")
     ap.add_argument("--images", type=Path, default=None,
-                    help="thư mục chứa 7 ảnh minh chứng đã chụp (mặc định: không chèn ảnh)")
+                    help="thư mục chứa ảnh minh chứng đã chụp (mặc định: không chèn ảnh)")
     args = ap.parse_args()
 
     images = None
     if args.images:
-        images = args.images if args.images.is_absolute() else (LAB / args.images)
-        if not images.is_dir():
-            print(f"[!] Không thấy thư mục ảnh: {images}", file=sys.stderr)
+        # chấp nhận đường dẫn tính từ thư mục hiện tại, từ report/ hoặc từ gốc repo
+        cands = [args.images] if args.images.is_absolute() else [
+            Path.cwd() / args.images, HERE / args.images,
+            LAB / args.images, LAB.parent / args.images]
+        images = next((c for c in cands if c.is_dir()), None)
+        if images is None:
+            print(f"[!] Không thấy thư mục ảnh: {args.images}", file=sys.stderr)
             return 2
-        missing = [n for n in ("01_env.png", "02_tables_count.png", "03_console.png",
-                               "04_s08_result.png", "05_explain_before_after.png",
-                               "06_expanded_counts.png", "07_s19_rank.png")
+        missing = [n for n in FIGURES
                    if not (images / n).exists()]
         if missing:
             print("[!] Thiếu ảnh: " + ", ".join(missing), file=sys.stderr)

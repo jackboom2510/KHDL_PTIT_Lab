@@ -74,22 +74,22 @@ bằng script (Pillow/vẽ khung terminal giả) — cách đó đã bị loại
 
 ```bash
 cd lab01_sql/evidence
-cat HUONG_DAN_CHUP_ANH.md          # 7 ảnh: lệnh, kết quả kỳ vọng, lưu ý che thông tin
+cat HUONG_DAN_CHUP_ANH.md          # 7 nhóm ảnh: lệnh, kết quả kỳ vọng, lưu ý che thông tin
 bash capture_commands.sh           # in lần lượt các nhóm lệnh
 bash capture_commands.sh --only 05 # in nhóm lệnh của một ảnh
 bash capture_commands.sh --run     # chạy luôn
 ```
 
 - Tên tệp cố định: `01_env.png`, `02_tables_count.png`, `03_console.png`,
-  `04_s08_result.png`, `05_explain_before_after.png`, `06_expanded_counts.png`,
-  `07_s19_rank.png` — trùng với danh mục ảnh ở mục 7 của báo cáo.
+  `04_s08_result_01–02.png`, `05_explain_before_after_01–02.png`, `06_expanded_counts.png`,
+  `07_s19_rank_01–03.png` — trùng với danh mục ảnh ở mục 7 của báo cáo.
 - Ảnh phải thấy cả câu lệnh và kết quả; che token/URI nếu có.
 - Ảnh thuộc về người làm bài, không đưa ảnh mẫu hay ảnh sinh tự động vào `evidence/`.
 
 ## Báo cáo
 
 - Báo cáo là **bản ngắn 4–5 trang**, sinh trực tiếp bằng Python: `python3 report/make_report.py`
-  (`--images evidence` để chèn 7 ảnh thật). Không dùng LaTeX, không cần TeX.
+  (`--images evidence` để chèn ảnh thật). Không dùng LaTeX, không cần TeX.
 - **Không** trình bày theo kiểu đồ án: không bìa riêng, không mục lục, không chia chương, không
   phụ lục. Cấu trúc bám 5 tiêu chí chấm ở mục 10 của đề: thông tin chung → cài đặt/tạo dữ liệu
   → CRUD → truy vấn nâng cao → index/EXPLAIN → mở rộng + báo cáo → danh mục ảnh → kết luận.

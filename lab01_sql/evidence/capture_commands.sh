@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# In ra (hoặc chạy) lần lượt các lệnh cần thực hiện trên Google Cloud Shell để chụp 7 ảnh
+# In ra (hoặc chạy) lần lượt các lệnh cần thực hiện trên Google Cloud Shell để chụp ảnh minh chứng
 # minh chứng. Mặc định chỉ IN hướng dẫn; thêm --run để chạy thật và dừng giữa các bước cho
 # bạn chụp màn hình.
 #
@@ -62,17 +62,17 @@ step 02 02_tables_count.png "Tạo 4 bảng, số dòng 5/5/6/8, kiểm tra kho�
 step 03 03_console.png "sql_console.py: câu nhiều dòng, một câu sai, EXIT (tự gõ trong console)" \
   'python3 sql_console.py'
 
-step 04 04_s08_result.png "Kết quả S08 (tổng tiền từng đơn) và S09 (doanh thu từng khách)" \
+step 04 04_s08_result_01.png "Kết quả S01–S12 khi chạy answers.sql (chụp 2 ảnh: _01, _02)" \
   'python3 run_sql.py sql/answers.sql'
 
-step 05 05_explain_before_after.png "EXPLAIN QUERY PLAN trước index (SCAN) và sau index (SEARCH)" \
+step 05 05_explain_before_after_01.png "EXPLAIN trước index (SCAN) và sau index (SEARCH) — chụp 2 ảnh _01, _02" \
   'python3 run_sql.py sql/explain.sql'
 
 step 06 06_expanded_counts.png "Dữ liệu mở rộng 100/30/500/1500 và kiểm tra khoá ngoại" \
   'python3 generate_data.py --force' \
   "python3 run_sql.py --sql \"$COUNT_SQL\" --db data/sales_extended.db"
 
-step 07 07_s19_rank.png "S19: xếp hạng khách hàng với RANK và DENSE_RANK" \
+step 07 07_s19_rank_01.png "S16–S21 trên dữ liệu mở rộng — chụp 3 ảnh _01, _02, _03" \
   'python3 run_sql.py sql/answers_homework.sql --db data/sales_extended.db'
 
 echo
