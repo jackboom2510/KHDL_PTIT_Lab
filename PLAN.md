@@ -15,7 +15,7 @@ Nguồn yêu cầu: hai PDF ở thư mục gốc. Chi tiết trích đề: `docs
 | M3 | LAB 01 — index/EXPLAIN S14–S15 + mở rộng dữ liệu S16–S21 | ✅ |
 | M4 | LAB 02 — Atlas, seed, CRUD, filter (N01–N09) | ⬜ |
 | M5 | LAB 02 — aggregation, `$lookup`, index, homework (N10–N22) | ⬜ |
-| M6 | Báo cáo PDF 2–3 trang + ảnh minh chứng + đóng ZIP nộp bài | ✅ (LAB 01: PDF 3 trang + 7 ảnh + ZIP đã kiểm chứng) |
+| M6 | Báo cáo PDF ngắn + ảnh minh chứng + đóng ZIP nộp bài | ✅ (LAB 01: PDF 5 trang + 11 ảnh + ZIP đã kiểm chứng) |
 
 ## 1. LAB 01 — SQL / SQLite
 
@@ -66,25 +66,30 @@ chứng minh index ở `sql/explain.sql`. Chi tiết kết quả đã kiểm ch�
 
 ### 1.3b Báo cáo
 
-- [x] `report/lab01_report_short.tex` — **bản nộp 2–3 trang** (2 cột, 10pt, đủ 5 tiêu chí chấm).
-- [x] `report/lab01_report.tex` — bản đầy đủ (9 mục + 4 phụ lục), số liệu lấy từ lần chạy thật.
-- [x] `report/compile.sh` (`2p|full|short|check`), `check_tex.py`, `pdf_pages.py` (cảnh báo > 3 trang).
-- [x] `report/README.md` — Overleaf, XeLaTeX, và mục "Co giãn độ dài" nếu bản gọn ra 4 trang.
-- [x] Xuất PDF 3 trang bằng `report/make_pdf.py` (fpdf2 + DejaVu, **không cần TeX**), có 6 ảnh minh chứng.
-- [x] Pipeline ảnh tách riêng `evidence/`: 7 ảnh PNG sinh từ output thật (`make_evidence.py`).
-- [x] `pack_submission.sh` đóng `submission/StudentID_SQL.zip`, đã giải nén và chạy lại độc lập.
-- [x] Báo cáo đồ án đầy đủ 37 trang (`report/make_report.py`): bìa có tên **Nguyễn Danh Thái —
-      B23DCKH105**, mục lục, danh mục từ viết tắt/hình/bảng, 6 chương, tham khảo, phụ lục A–C.
+- [x] `report/make_report.py` — báo cáo **ngắn 4–5 trang, đen trắng**, bám 5 tiêu chí chấm
+      (cài đặt/dữ liệu 2,0 · CRUD 2,0 · truy vấn nâng cao 3,0 · index 1,5 · mở rộng + báo cáo 1,5).
+      Sinh PDF bằng fpdf2 (**không cần TeX**), tự đếm trang và tự thu nhỏ ảnh nếu vượt 5 trang.
+- [x] Bản đã xuất: `report/BaoCao_LAB01_B23DCKH105.pdf` — **4 trang** không ảnh, **5 trang** khi
+      chèn đủ 11 ảnh; tác giả **Nguyễn Danh Thái — B23DCKH105**.
+- [x] `report/requirements.txt` (`fpdf2`, `pillow`), `report/pdf_pages.py` (đếm trang),
+      `report/README.md` (cách xuất báo cáo, quy ước trình bày, vì sao giới hạn 5 trang).
+- [x] `evidence/HUONG_DAN_CHUP_ANH.md` + `evidence/capture_commands.sh` — danh sách lệnh cần chạy
+      để tự chụp ảnh minh chứng trên Google Cloud Shell.
+- [x] **Đã chụp ảnh thật** trên Google Cloud Shell: 7 nhóm / 11 tệp (`01_env.png`,
+      `02_tables_count.png`, `03_console.png`, `04_s08_result_01–02`, `05_explain_before_after_01–02`,
+      `06_expanded_counts.png`, `07_s19_rank_01–03`); PDF 5 trang đã chèn đủ 11 ảnh.
 - [ ] Điền tên lớp và giảng viên hướng dẫn (hằng số `CLASS_NAME`, `INSTRUCTOR` trong
-      `make_report.py`), rồi chạy lại để cập nhật cả bìa lẫn PDF.
-- [ ] (Tuỳ chọn) chụp lại ảnh 01_env trên Cloud Shell thật nếu giảng viên yêu cầu ảnh terminal gốc.
+      `make_report.py`), rồi xuất lại PDF.
+- [x] `pack_submission.sh` đóng `submission/StudentID_SQL.zip`, đã giải nén và chạy lại độc lập.
+- [x] **Đã bỏ** hướng báo cáo đồ án 37 trang (LaTeX + bìa/mục lục/phụ lục) và pipeline sinh ảnh
+      giả bằng script — thay bằng báo cáo ngắn + ảnh chụp thật.
 
 ### 1.4 Nộp
 
 `StudentID_SQL.zip` = `data/sales.db` (+ `sales_extended.db` nếu dung lượng cho phép),
 `sql_console.py`, `sql/schema.sql`, `sql/seed.sql`, `sql/answers.sql` (S01–S15),
 `sql/answers_homework.sql` (S16–S21), `sql/explain.sql`, `build_db.py`, `generate_data.py`,
-`run_sql.py`, báo cáo PDF 2–3 trang, ảnh minh chứng.
+`run_sql.py`, báo cáo PDF 4–5 trang, ảnh minh chứng (ảnh chụp thật).
 
 ## 2. LAB 02 — NoSQL / MongoDB Atlas
 
@@ -169,8 +174,8 @@ báo cáo PDF 2–3 trang + ảnh Data Explorer và ảnh terminal.
 
 | Hạng mục | Kết quả |
 | --- | --- |
-| `evidence/make_evidence.py` | 7/7 ảnh PNG, dựng CSDL trên `data/.evidence/` (không đụng `sales.db`) |
-| Render ảnh | DejaVuSansMono thiếu 46 glyph tiếng Việt → renderer fallback sang DejaVuSans theo từng ký tự, không còn ô vuông |
-| `report/make_pdf.py` | `lab01_report_short_pdf.pdf` **3 trang**, 6 hình, tự co ảnh ×0.88 để vừa giới hạn |
-| Nội dung PDF | 6 mục: môi trường + tổ chức · mô hình dữ liệu · S01–S15 · index/EXPLAIN · S16–S21 · kết luận |
+| `report/make_report.py` | PDF **4 trang** (không ảnh) và **5 trang** khi chèn 11 ảnh; 6 bảng, đen trắng |
+| Bố cục PDF | 8 mục theo 5 tiêu chí chấm: thông tin chung · cài đặt/dữ liệu · CRUD · truy vấn nâng cao · index/EXPLAIN · mở rộng + báo cáo · danh mục ảnh · kết luận |
+| Ảnh minh chứng | Chụp thật trên Cloud Shell theo `evidence/HUONG_DAN_CHUP_ANH.md` (7 nhóm / 11 tệp); **không** sinh bằng script nữa |
+| Kiểm tra trang | Tự đếm bằng `pdf_pages.py` + fallback pypdfium2, thu nhỏ ảnh 1,0 → 0,6, thoát mã 1 nếu vẫn > 5 trang |
 | `pack_submission.sh 22CNTT0123` | 21 tệp, 0,9 MB; giải nén chạy lại: `answers.sql` 18 câu 0 lỗi, homework 9 câu 0 lỗi, `sql_console.py` OK |
