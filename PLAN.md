@@ -15,7 +15,7 @@ Nguồn yêu cầu: hai PDF ở thư mục gốc. Chi tiết trích đề: `docs
 | M3 | LAB 01 — index/EXPLAIN S14–S15 + mở rộng dữ liệu S16–S21 | ✅ |
 | M4 | LAB 02 — Atlas, seed, CRUD, filter (N01–N09) | ⬜ |
 | M5 | LAB 02 — aggregation, `$lookup`, index, homework (N10–N22) | ⬜ |
-| M6 | Báo cáo PDF 2–3 trang + ảnh minh chứng + đóng ZIP nộp bài | 🟡 (LAB 01: bản 2–3 trang + công cụ đếm trang xong; còn PDF + ảnh) |
+| M6 | Báo cáo PDF 2–3 trang + ảnh minh chứng + đóng ZIP nộp bài | ✅ (LAB 01: PDF 3 trang + 7 ảnh + ZIP đã kiểm chứng) |
 
 ## 1. LAB 01 — SQL / SQLite
 
@@ -70,8 +70,11 @@ chứng minh index ở `sql/explain.sql`. Chi tiết kết quả đã kiểm ch�
 - [x] `report/lab01_report.tex` — bản đầy đủ (9 mục + 4 phụ lục), số liệu lấy từ lần chạy thật.
 - [x] `report/compile.sh` (`2p|full|short|check`), `check_tex.py`, `pdf_pages.py` (cảnh báo > 3 trang).
 - [x] `report/README.md` — Overleaf, XeLaTeX, và mục "Co giãn độ dài" nếu bản gọn ra 4 trang.
-- [ ] Biên dịch ra PDF (cần TeX Live có `vntex`; sandbox không cài được — chặn CTAN + apt).
-- [ ] Điền trang bìa (giảng viên, MSSV, lớp) và dán ảnh minh chứng vào Phụ lục B.
+- [x] Xuất PDF 3 trang bằng `report/make_pdf.py` (fpdf2 + DejaVu, **không cần TeX**), có 6 ảnh minh chứng.
+- [x] Pipeline ảnh tách riêng `evidence/`: 7 ảnh PNG sinh từ output thật (`make_evidence.py`).
+- [x] `pack_submission.sh` đóng `submission/StudentID_SQL.zip`, đã giải nén và chạy lại độc lập.
+- [ ] Điền tên/MSSV/lớp (trang đầu PDF và `pack_submission.sh <MSSV>`).
+- [ ] (Tuỳ chọn) chụp lại ảnh 01_env trên Cloud Shell thật nếu giảng viên yêu cầu ảnh terminal gốc.
 
 ### 1.4 Nộp
 
@@ -158,3 +161,13 @@ báo cáo PDF 2–3 trang + ảnh Data Explorer và ảnh terminal.
 | `python3 run_sql.py sql/answers_homework.sql --db data/sales_extended.db` | 13 tháng doanh thu; 8 khách chưa mua; 4 SP chưa bán; RANK/DENSE_RANK khớp; TEMP TABLE chạy được |
 | `python3 run_sql.py sql/explain.sql` | trước: `SCAN orders` → sau: `SEARCH orders USING COVERING INDEX idx_orders_customer` |
 | `python3 sql_console.py` (qua pipe) | nhận câu lệnh nhiều dòng, in cột + rows, EXIT thoát |
+
+## 6. Nhật ký kiểm chứng bước nộp bài (M6)
+
+| Hạng mục | Kết quả |
+| --- | --- |
+| `evidence/make_evidence.py` | 7/7 ảnh PNG, dựng CSDL trên `data/.evidence/` (không đụng `sales.db`) |
+| Render ảnh | DejaVuSansMono thiếu 46 glyph tiếng Việt → renderer fallback sang DejaVuSans theo từng ký tự, không còn ô vuông |
+| `report/make_pdf.py` | `lab01_report_short_pdf.pdf` **3 trang**, 6 hình, tự co ảnh ×0.88 để vừa giới hạn |
+| Nội dung PDF | 6 mục: môi trường + tổ chức · mô hình dữ liệu · S01–S15 · index/EXPLAIN · S16–S21 · kết luận |
+| `pack_submission.sh 22CNTT0123` | 21 tệp, 0,9 MB; giải nén chạy lại: `answers.sql` 18 câu 0 lỗi, homework 9 câu 0 lỗi, `sql_console.py` OK |

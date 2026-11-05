@@ -67,6 +67,26 @@ phần nào là yêu cầu tối thiểu, phần nào là mở rộng.
   `SEARCH orders USING INDEX idx_orders_customer`.
 - Không được sửa `explain.sql` bằng tay cho đẹp: output phải copy nguyên từ terminal.
 
+## Sinh ảnh minh chứng (pipeline tách riêng)
+
+Ảnh minh chứng **không** sinh trong `build_db.py` / `run_sql.py` mà có pipeline riêng ở
+`evidence/`:
+
+```bash
+cd lab01_sql/evidence
+pip install -r requirements.txt        # chỉ Pillow
+python3 make_evidence.py               # 7 ảnh vào ../evidence/
+python3 make_evidence.py --only 05_explain_before_after
+python3 make_evidence.py --from-log    # render lại từ evidence/_logs, không chạy lệnh
+```
+
+- `runner.py` chạy lệnh thật trong `lab01_sql/` và dựng CSDL **trên bản sao** ở
+  `data/.evidence/` (đã gitignore) → ảnh luôn ở trạng thái sạch, không phụ thuộc lần chạy trước.
+- `scenes.py` khai báo 7 scene, tên tệp khớp danh mục Phụ lục B của báo cáo.
+- `render.py` chỉ vẽ PNG bằng Pillow; **không** chứa số liệu viết tay.
+- Không sửa ảnh bằng tay: nếu số liệu thay đổi, chạy lại pipeline rồi xuất lại PDF
+  (`report/make_pdf.py`).
+
 ## Báo cáo và minh chứng
 
 - Đề yêu cầu **báo cáo PDF 2–3 trang** → bản nộp chính là `report/lab01_report_short.tex`

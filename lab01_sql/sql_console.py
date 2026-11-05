@@ -26,7 +26,12 @@ DEFAULT_DB = BASE / "data" / "sales.db"
 
 
 def main(argv: list[str]) -> int:
-    db_path = Path(argv[1]) if len(argv) > 1 else DEFAULT_DB
+    if len(argv) > 1:
+        db_path = Path(argv[1])
+    elif DEFAULT_DB.exists() or not (BASE / "sales.db").exists():
+        db_path = DEFAULT_DB
+    else:
+        db_path = BASE / "sales.db"        # bài nộp đặt CSDL ngay cạnh script
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
     con = sqlite3.connect(db_path)

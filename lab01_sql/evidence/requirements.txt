@@ -1,0 +1,3 @@
+# Chỉ cần cho pipeline sinh ảnh minh chứng (không cần cho bài làm SQL).
+#   python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+pillow>=10.0
