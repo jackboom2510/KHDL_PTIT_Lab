@@ -61,7 +61,5 @@ Thumbs.db
 *.run.xml
 !*.pdf
 
-# Pipeline ảnh minh chứng / PDF
-lab01_sql/data/.evidence/
-lab01_sql/evidence/_logs/
+# Ảnh minh chứng / PDF (bản .tmp khi xuất lại báo cáo)
 lab01_sql/report/*_pdf.pdf.tmp

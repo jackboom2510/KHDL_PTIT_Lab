@@ -6,7 +6,7 @@
 #
 # Cấu trúc ZIP bám đúng mục 10 của đề:
 #   sales.db, sql_console.py, answers.sql (-- S01…S21), chương trình tạo dữ liệu mở rộng,
-#   báo cáo PDF 2–3 trang, ảnh minh chứng.
+#   báo cáo PDF 4–5 trang, ảnh minh chứng chụp trên Cloud Shell.
 #
 # Ghi chú: `answers.sql` trong đề được hiểu là toàn bộ phần trả lời S01–S21; bài làm tách
 # thành answers.sql (bắt buộc S01–S15) + answers_homework.sql (bổ sung S16–S21) nên ZIP
@@ -33,20 +33,25 @@ cp data/sales_extended.db         "$ROOT/data/sales_extended.db"
 cp sql_console.py build_db.py generate_data.py run_sql.py "$ROOT/"
 cp sql/schema.sql sql/seed.sql sql/answers.sql sql/answers_homework.sql sql/explain.sql "$ROOT/sql/"
 
-# --- báo cáo PDF 2–3 trang ---
-PDF="report/lab01_report_short_pdf.pdf"
-if [[ ! -f "$PDF" ]]; then
-  echo "[i] chưa có PDF, đang xuất bằng make_pdf.py ..."
-  python3 report/make_pdf.py >/dev/null
+# --- báo cáo PDF 4–5 trang ---
+PDF="$(ls report/BaoCao_LAB01_*.pdf 2>/dev/null | head -n1 || true)"
+if [[ -z "$PDF" ]]; then
+  echo "[i] chưa có PDF, đang xuất bằng report/make_report.py ..."
+  python3 report/make_report.py --images evidence >/dev/null || true
+  PDF="$(ls report/BaoCao_LAB01_*.pdf 2>/dev/null | head -n1 || true)"
 fi
-cp "$PDF" "$ROOT/report/${MSSV}_SQL_report.pdf"
+if [[ -n "$PDF" ]]; then
+  cp "$PDF" "$ROOT/report/${MSSV}_SQL_report.pdf"
+else
+  echo "[!] Không xuất được báo cáo PDF (xem report/README.md)." >&2
+fi
 
-# --- ảnh minh chứng + manifest ---
+# --- ảnh minh chứng (ảnh chụp thật trên Google Cloud Shell) ---
 if [[ -z "$(ls -A evidence/*.png 2>/dev/null)" ]]; then
-  echo "[!] Chưa có ảnh minh chứng. Chạy: (cd evidence && python3 make_evidence.py)" >&2
+  echo "[!] Chưa có ảnh minh chứng — xem evidence/HUONG_DAN_CHUP_ANH.md," >&2
+  echo "    chụp 7 ảnh 01_env.png … 07_s19_rank.png rồi chạy lại." >&2
 fi
 cp evidence/*.png "$ROOT/evidence/" 2>/dev/null || true
-cp evidence/manifest.json "$ROOT/evidence/" 2>/dev/null || true
 
 # --- bản đồ ánh xạ yêu cầu đề bài -> file ---
 cat > "$ROOT/README_MAPPING.txt" <<EOF
@@ -64,8 +69,8 @@ Ngày đóng gói: $(date +%F)
   generate_data.py ......... sinh dữ liệu mở rộng 100/30/500/1500 (random.seed = 2026)
   run_sql.py ............... chạy file .sql bằng Python khi máy không có sqlite3 CLI
   data/sales_extended.db ... dữ liệu mở rộng (dùng cho S16–S21)
-  report/*_report.pdf ...... báo cáo 3 trang, có ảnh minh chứng
-  evidence/*.png ........... 7 ảnh minh chứng, sinh tự động bằng evidence/make_evidence.py
+  report/*_report.pdf ...... báo cáo 4–5 trang theo 5 tiêu chí chấm, có ảnh minh chứng
+  evidence/*.png ........... 7 ảnh chụp thật trên Google Cloud Shell (xem mục 7 báo cáo)
 
 CHẠY LẠI
   python3 build_db.py --force
