@@ -26,6 +26,12 @@ from pathlib import Path
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
+for _stream in (sys.stdout, sys.stderr):      # Windows: tránh UnicodeEncodeError khi in
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError, OSError):
+        pass
+
 HERE = Path(__file__).resolve().parent
 LAB = HERE.parent
 SQL_DIR = LAB / "sql"

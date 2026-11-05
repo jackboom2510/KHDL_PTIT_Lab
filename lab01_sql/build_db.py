@@ -16,6 +16,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
+import utf8_console  # noqa: F401 - bật UTF-8 cho Windows
+
 BASE = Path(__file__).resolve().parent
 SQL_DIR = BASE / "sql"
 DEFAULT_DB = BASE / "data" / "sales.db"

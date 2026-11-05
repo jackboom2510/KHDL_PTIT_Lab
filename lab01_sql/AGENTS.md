@@ -86,6 +86,15 @@ bash capture_commands.sh --run     # chạy luôn
 - Ảnh phải thấy cả câu lệnh và kết quả; che token/URI nếu có.
 - Ảnh thuộc về người làm bài, không đưa ảnh mẫu hay ảnh sinh tự động vào `evidence/`.
 
+## Windows và bảng mã
+
+- Mọi script chạy được cả Linux/Cloud Shell lẫn Windows: đầu tệp có
+  `import utf8_console  # noqa: F401` (riêng `report/make_report.py` tự `reconfigure`).
+- `utf8_console.py` bật code page 65001 và ép `stdout`/`stderr` sang UTF-8 với `errors="replace"`,
+  nên không còn `UnicodeEncodeError: 'charmap' codec ...` khi in tiếng Việt.
+- Đọc/ghi tệp luôn chỉ rõ `encoding="utf-8"`; không dựa vào locale mặc định.
+- Script mới thêm phải giữ hai quy ước trên và phải được `pack_submission.sh` copy vào ZIP.
+
 ## Báo cáo
 
 - Báo cáo là **bản ngắn 4–5 trang**, sinh trực tiếp bằng Python: `python3 report/make_report.py`

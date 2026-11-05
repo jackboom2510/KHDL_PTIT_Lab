@@ -26,6 +26,7 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   ├── build_db.py            # dựng data/sales.db từ sql/ + kiểm tra count
 │   ├── generate_data.py       # sinh data/sales_extended.db (100/30/500/1500)
 │   ├── run_sql.py             # chạy file .sql bằng Python (khi không có sqlite3 CLI)
+│   ├── utf8_console.py        # ép stdout UTF-8 (bắt buộc trên Windows cp1252)
 │   ├── sql/
 │   │   ├── schema.sql         # 4 bảng + khoá ngoại
 │   │   ├── seed.sql           # dữ liệu mẫu đúng đề (5/5/6/8)
@@ -82,6 +83,22 @@ python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 ```
 
 Kiểm tra nhanh dữ liệu mẫu: `customers = 5`, `products = 5`, `orders = 6`, `order_items = 8`.
+
+### Chạy trên Windows
+
+Nếu console mặc định không phải UTF-8 (cp1252/cp437), Python sẽ chết khi in tiếng Việt:
+
+```
+UnicodeEncodeError: 'charmap' codec can't encode character '\u0110' in position 0
+```
+
+Các script (`build_db.py`, `generate_data.py`, `run_sql.py`, `sql_console.py`,
+`report/make_report.py`) đã tự gọi `utf8_console.enable_utf8()` — bật code page 65001 và ép
+`stdout`/`stderr` sang UTF-8. Không cần đặt biến môi trường. Nếu vẫn gặp lỗi font, chạy
+`chcp 65001` trước hoặc dùng Windows Terminal / Git Bash.
+
+`pack_submission.sh` chạy được trong Git Bash: tự chọn `python3`/`python`/`py` và dùng Python
+`zipfile` khi máy không có lệnh `zip`.
 
 ### Ảnh minh chứng (tự chụp) và báo cáo PDF
 
