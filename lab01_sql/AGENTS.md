@@ -67,41 +67,39 @@ phần nào là yêu cầu tối thiểu, phần nào là mở rộng.
   `SEARCH orders USING INDEX idx_orders_customer`.
 - Không được sửa `explain.sql` bằng tay cho đẹp: output phải copy nguyên từ terminal.
 
-## Sinh ảnh minh chứng (pipeline tách riêng)
+## Ảnh minh chứng (chụp thật trên Cloud Shell)
 
-Ảnh minh chứng **không** sinh trong `build_db.py` / `run_sql.py` mà có pipeline riêng ở
-`evidence/`:
+Ảnh minh chứng **phải là ảnh chụp thật** trên `shell.cloud.google.com`; **không** dựng lại
+bằng script (Pillow/vẽ khung terminal giả) — cách đó đã bị loại vì không phải minh chứng thật.
 
 ```bash
 cd lab01_sql/evidence
-pip install -r requirements.txt        # chỉ Pillow
-python3 make_evidence.py               # 7 ảnh vào ../evidence/
-python3 make_evidence.py --only 05_explain_before_after
-python3 make_evidence.py --from-log    # render lại từ evidence/_logs, không chạy lệnh
+cat HUONG_DAN_CHUP_ANH.md          # 7 ảnh: lệnh, kết quả kỳ vọng, lưu ý che thông tin
+bash capture_commands.sh           # in lần lượt các nhóm lệnh
+bash capture_commands.sh --only 05 # in nhóm lệnh của một ảnh
+bash capture_commands.sh --run     # chạy luôn
 ```
 
-- `runner.py` chạy lệnh thật trong `lab01_sql/` và dựng CSDL **trên bản sao** ở
-  `data/.evidence/` (đã gitignore) → ảnh luôn ở trạng thái sạch, không phụ thuộc lần chạy trước.
-- `scenes.py` khai báo 7 scene, tên tệp khớp danh mục Phụ lục B của báo cáo.
-- `render.py` chỉ vẽ PNG bằng Pillow; **không** chứa số liệu viết tay.
-- Không sửa ảnh bằng tay: nếu số liệu thay đổi, chạy lại pipeline rồi xuất lại PDF
-  (`report/make_pdf.py`).
+- Tên tệp cố định: `01_env.png`, `02_tables_count.png`, `03_console.png`,
+  `04_s08_result.png`, `05_explain_before_after.png`, `06_expanded_counts.png`,
+  `07_s19_rank.png` — trùng với danh mục ảnh ở mục 7 của báo cáo.
+- Ảnh phải thấy cả câu lệnh và kết quả; che token/URI nếu có.
+- Ảnh thuộc về người làm bài, không đưa ảnh mẫu hay ảnh sinh tự động vào `evidence/`.
 
-## Báo cáo và minh chứng
+## Báo cáo
 
-- Đề yêu cầu **báo cáo PDF 2–3 trang** → bản nộp chính là `report/lab01_report_short.tex`
-  (2 cột, 10pt). Bản `report/lab01_report.tex` (~10 trang, có phụ lục) chỉ để tham khảo/đối chiếu,
-  **không** dùng làm bản nộp khi bị giới hạn trang.
-- Biên dịch: `bash compile.sh` (= `2p`), hoặc `full`/`short`/`check`. Trước khi compile script
-  chạy `check_tex.py` (bắt lỗi escape, cân bằng môi trường, số ô bảng); sau compile chạy
-  `pdf_pages.py --max 3` để cảnh báo vượt trang. Nếu ra 4 trang: xem "Co giãn độ dài" trong
-  `report/README.md`, không tự ý xoá nội dung chuyên môn.
+- Báo cáo là **bản ngắn 4–5 trang**, sinh trực tiếp bằng Python: `python3 report/make_report.py`
+  (`--images evidence` để chèn 7 ảnh thật). Không dùng LaTeX, không cần TeX.
+- **Không** trình bày theo kiểu đồ án: không bìa riêng, không mục lục, không chia chương, không
+  phụ lục. Cấu trúc bám 5 tiêu chí chấm ở mục 10 của đề: thông tin chung → cài đặt/tạo dữ liệu
+  → CRUD → truy vấn nâng cao → index/EXPLAIN → mở rộng + báo cáo → danh mục ảnh → kết luận.
+- Trình bày **đen trắng**: chữ đen trên nền trắng, xám chỉ cho chú thích ảnh, không màu nhấn,
+  không icon, gạch đầu dòng là dấu `-`, bảng chỉ kẻ đường ngang.
+- Script tự đếm số trang: nếu vượt 5 trang thì thu nhỏ ảnh dần (1,0 → 0,9 → 0,8 → 0,7 → 0,6);
+  vẫn vượt thì trả mã lỗi 1. Cắt bớt gạch đầu dòng chứ không cắt nội dung chuyên môn.
 - Số liệu trong báo cáo **phải khớp** output thật của `run_sql.py`; khi sửa dữ liệu/seed phải
   chạy lại các lệnh ở mục "Kiểm tra trước khi nộp" và cập nhật bảng trong báo cáo.
-- `evidence/` đặt tên `01_env.png`, `02_tables_count.png`, `03_s08_result.png`,
-  `04_explain_before_after.png`, `05_expanded_counts.png`, `06_rank.png`…
-- Báo cáo `report/lab01_report.md` → xuất PDF 2–3 trang, cấu trúc: môi trường → mô hình dữ
-  liệu → kết quả S01–S15 → mở rộng + index → nhận xét S21.
+- Đề ghi "báo cáo PDF 2–3 trang"; bản 4–5 trang này là bản nộp kèm, ưu tiên đủ ý theo tiêu chí.
 
 ## Kiểm tra trước khi nộp (chạy được trong sandbox)
 
