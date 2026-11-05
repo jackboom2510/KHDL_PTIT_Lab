@@ -4,12 +4,34 @@ Thư mục này có **hai báo cáo**, phục vụ hai tình huống khác nhau 
 
 | File | Số trang | Khi nào dùng |
 | --- | --- | --- |
-| **`lab01_report_short_pdf.pdf`** | **3 trang** | **Bản nộp chính đã xuất** — sinh bằng `make_pdf.py`, có 6 ảnh minh chứng thật |
+| **`BaoCaoDoAn_LAB01_NguyenDanhThai_B23DCKH105.pdf`** | **37 trang** | **Báo cáo đồ án đầy đủ** — bìa, mục lục, danh mục, 6 chương, tham khảo, 3 phụ lục. Sinh bằng `make_report.py` |
+| `lab01_report_short_pdf.pdf` | 3 trang | Bản tóm tắt ngắn (đề yêu cầu "báo cáo PDF 2–3 trang") — sinh bằng `make_pdf.py` |
 | `make_pdf.py` | — | Xuất PDF trực tiếp bằng Python (**không cần TeX**) — dùng khi máy không có pdflatex |
 | `lab01_report_short.tex` | 2–3 trang | Bản LaTeX tương đương (2 cột) — dùng khi có TeX hoặc nộp trên Overleaf |
 | `lab01_report.tex` | ~10 trang | Bản đầy đủ (9 mục + 4 phụ lục), tham khảo/đối chiếu |
 
-### Xuất PDF không cần TeX (đường dùng được trong sandbox / máy chỉ có Python)
+### Báo cáo đồ án (văn phong đồ án, 37 trang)
+
+```bash
+cd lab01_sql/report
+python3 make_report.py            # -> BaoCaoDoAn_LAB01_NguyenDanhThai_B23DCKH105.pdf
+python3 make_report.py --no-images
+```
+
+Cấu trúc theo văn phong đồ án thông thường: **trang bìa** (trường, khoa, tên đề tài, GVHD,
+sinh viên, MSSV, lớp, năm) → **tóm tắt** → **mục lục** → **danh mục từ viết tắt** → **danh mục
+hình vẽ** → **danh mục bảng biểu** → **Chương 1 Mở đầu** (lý do, mục tiêu, đối tượng/phạm vi,
+phương pháp, bố cục) → **Chương 2 Cơ sở lý thuyết** → **Chương 3 Phân tích và thiết kế** (yêu
+cầu, ERD, chi tiết bảng, kiến trúc, dữ liệu kiểm thử) → **Chương 4 Triển khai và thực nghiệm**
+(schema, CRUD, truy vấn tổng hợp, chỉ mục, dữ liệu mở rộng, kiểm thử) → **Chương 5 Kết quả và
+đánh giá** (đối chiếu tiêu chí, hiệu quả chỉ mục, hạn chế, bài học) → **Chương 6 Kết luận** →
+**Tài liệu tham khảo** → **Phụ lục A–C** (cấu trúc bài nộp, mã nguồn, ảnh minh chứng).
+
+Điểm kỹ thuật: mục lục dùng `insert_toc_placeholder` của fpdf2 (có link, số trang tự động);
+danh mục hình/bảng được thu thập ở lượt sinh thứ nhất rồi chạy lại đến khi số trang hội tụ;
+ERD vẽ trực tiếp bằng fpdf (hộp + mũi tên + nhãn 1:N) nên không cần TikZ.
+
+### Xuất bản tóm tắt 3 trang (không cần TeX)
 
 ```bash
 cd lab01_sql/report
