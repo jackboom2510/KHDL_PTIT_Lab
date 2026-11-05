@@ -33,25 +33,16 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   │   ├── answers_homework.sql # BỔ SUNG — S16–S21
 │   │   └── explain.sql        # EXPLAIN trước/sau index (S15, S20)
 │   ├── data/                  # sales.db, sales_extended.db (sinh tự động, không commit)
-│   ├── evidence/              # pipeline sinh ảnh minh chứng (chạy riêng)
-│   │   ├── make_evidence.py   # sinh 7 ảnh PNG từ output thật
-│   │   ├── scenes.py          # khai báo 7 scene (tên khớp phụ lục báo cáo)
-│   │   ├── runner.py          # chạy lệnh trên bản sao CSDL trong data/.evidence
-│   │   ├── render.py          # vẽ khung terminal -> PNG (Pillow + fallback font)
-│   │   └── manifest.json      # ảnh nào sinh từ lệnh nào
+│   ├── evidence/              # ảnh chụp minh chứng (11 PNG, chụp trên Cloud Shell)
+│   │   ├── HUONG_DAN_CHUP_ANH.md  # 7 nhóm ảnh: lệnh cần chạy, nội dung cần thấy
+│   │   └── capture_commands.sh    # in/chạy lần lượt các lệnh để chụp
 │   ├── pack_submission.sh     # đóng gói submission/StudentID_SQL.zip
-│   ├── report/                # báo cáo LaTeX + PDF
-│   │   ├── lab01_report_short.tex # BẢN NỘP: gọn 2–3 trang, 2 cột
-│   │   ├── lab01_report.tex   # bản đầy đủ (9 mục + 4 phụ lục), tham khảo
-│   │   ├── make_report.py     # báo cáo ĐỒ ÁN đầy đủ 37 trang (bìa, mục lục, 6 chương)
-│   │   ├── BaoCaoDoAn_LAB01_NguyenDanhThai_B23DCKH105.pdf
-│   │   ├── make_pdf.py        # bản tóm tắt 3 trang (không cần TeX)
-│   │   ├── lab01_report_short_pdf.pdf  # bản nộp đã xuất, 3 trang, 6 ảnh minh chứng
-│   │   ├── compile.sh         # bash compile.sh [2p|full|short|check]
-│   │   ├── check_tex.py       # kiểm tra cú pháp LaTeX (không cần TeX)
-│   │   ├── pdf_pages.py       # đếm số trang PDF, cảnh báo nếu > 3
-│   │   └── README.md          # hướng dẫn compile / Overleaf / co giãn độ dài
-│   └── evidence/              # ảnh minh chứng
+│   ├── report/                # báo cáo PDF 4–5 trang, đen trắng
+│   │   ├── make_report.py     # sinh PDF theo 5 tiêu chí chấm (fpdf2, không cần TeX)
+│   │   ├── requirements.txt   # fpdf2 + pillow
+│   │   ├── pdf_pages.py       # đếm số trang PDF
+│   │   ├── BaoCao_LAB01_B23DCKH105.pdf  # bản đã xuất (4 trang, 5 trang khi có ảnh)
+│   │   └── README.md          # cách xuất báo cáo, quy ước trình bày
 ├── lab02_nosql/
 │   ├── AGENTS.md
 │   ├── n_answers.py           # BẮT BUỘC  — N01–N15 (sẽ thêm ở M4)
@@ -92,40 +83,40 @@ python3 run_sql.py sql/explain.sql --db data/sales_extended.db
 
 Kiểm tra nhanh dữ liệu mẫu: `customers = 5`, `products = 5`, `orders = 6`, `order_items = 8`.
 
-### Ảnh minh chứng (pipeline riêng) và báo cáo PDF
+### Ảnh minh chứng (tự chụp) và báo cáo PDF
+
+Ảnh minh chứng phải là **ảnh chụp thật** trên `shell.cloud.google.com`, không dùng ảnh dựng lại
+bằng script. Danh sách lệnh cần chạy và nội dung cần thấy của từng ảnh:
 
 ```bash
 cd lab01_sql/evidence
-pip install -r requirements.txt     # chỉ Pillow
-python3 make_evidence.py            # 7 ảnh PNG -> ../evidence/
-python3 make_evidence.py --only 05_explain_before_after   # sinh lại 1 ảnh
-python3 make_evidence.py --from-log # render lại từ log, không chạy lệnh
+cat HUONG_DAN_CHUP_ANH.md               # 7 nhóm ảnh: lệnh, kết quả kỳ vọng, lưu ý che thông tin
+bash capture_commands.sh                # in lần lượt 7 nhóm lệnh
+bash capture_commands.sh --only 05      # chỉ nhóm lệnh của ảnh 05
+bash capture_commands.sh --run          # chạy luôn chứ không chỉ in
+# lưu ảnh theo đúng tên: 01_env.png … 07_s19_rank_03.png (nhóm dài chụp nhiều ảnh _01, _02)
 ```
 
 ```bash
 cd lab01_sql/report
-pip install -r ../evidence/requirements.txt   # fpdf2 + pillow
-python3 make_report.py              # -> báo cáo đồ án đầy đủ (37 trang, bìa + mục lục)
-python3 make_pdf.py                 # -> bản tóm tắt 3 trang (có ảnh)
-bash compile.sh                     # (tuỳ chọn) bản LaTeX 2–3 trang nếu máy có TeX
-bash compile.sh full                # bản đầy đủ có phụ lục (~10 trang)
+pip install -r requirements.txt         # fpdf2 + pillow
+python3 make_report.py                  # báo cáo 4 trang (chưa chèn ảnh)
+python3 make_report.py --images ../evidence   # chèn 11 ảnh thật -> 5 trang
 ```
 
-Pipeline ảnh **tách riêng** khỏi luồng dữ liệu: nó dựng CSDL trên bản sao trong
-`data/.evidence/` (gitignore), nên ảnh luôn ở trạng thái sạch và không làm thay đổi `sales.db`.
+Báo cáo ngắn 4–5 trang, đen trắng, tổ chức theo 5 tiêu chí chấm; tự thu nhỏ ảnh nếu vượt 5
+trang. Chi tiết: [`lab01_sql/report/README.md`](lab01_sql/report/README.md).
 
 ### Đóng gói nộp bài
 
 ```bash
 bash lab01_sql/pack_submission.sh 22CNTT0123
 # -> submission/22CNTT0123_SQL.zip: data/sales.db, sql_console.py, sql/answers.sql (S01–S15),
-#    sql/answers_homework.sql (S16–S21), sql/explain.sql, generator, report PDF 3 trang,
-#    7 ảnh minh chứng, README_MAPPING.txt ánh xạ yêu cầu -> file.
+#    sql/answers_homework.sql (S16–S21), sql/explain.sql, generator, report PDF 4–5 trang,
+#    11 ảnh minh chứng, README_MAPPING.txt ánh xạ yêu cầu -> file.
 ```
 
-Cần TeX Live có `vntex`/`babel-vietnamese`; hoặc upload thư mục `report/` lên Overleaf và chọn
-pdfLaTeX. Chi tiết: [`lab01_sql/report/README.md`](lab01_sql/report/README.md).
-`answers.sql` chạy lại nhiều lần vẫn sạch: S05 chỉ nhân 10% khi Mouse còn ở giá gốc 250.000,
+Không cần TeX: PDF sinh bằng Python (fpdf2). `answers.sql` chạy lại nhiều lần vẫn sạch: S05 chỉ nhân 10% khi Mouse còn ở giá gốc 250.000,
 S06 xoá đúng khách vừa thêm.
 
 ## Chạy LAB 02 (MongoDB Atlas)
@@ -150,7 +141,7 @@ python3 n_answers.py      # đáp án N01–N22
 
 - `StudentID_SQL.zip` — `data/sales.db`, `sql_console.py`, `sql/answers.sql` (S01–S15),
   `sql/answers_homework.sql` (S16–S21), `sql/explain.sql`, `build_db.py`, `generate_data.py`,
-  `run_sql.py`, báo cáo PDF 2–3 trang, ảnh minh chứng.
+  `run_sql.py`, báo cáo PDF 4–5 trang, ảnh minh chứng.
 - `StudentID_NoSQL.zip` — `connect.py`, `seed.py`, `lab_queries.py`, mã giải N01–N22, báo cáo
   PDF 2–3 trang, ảnh Data Explorer/terminal.
 

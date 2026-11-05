@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Đếm số trang của file PDF và cảnh báo nếu vượt giới hạn 2–3 trang của đề bài.
+"""Đếm số trang của file PDF và cảnh báo nếu vượt giới hạn 5 trang của báo cáo.
 
-    python3 pdf_pages.py lab01_report_short.pdf            # giới hạn mặc định 1..3
-    python3 pdf_pages.py lab01_report_short.pdf --max 3 --min 2
-    python3 pdf_pages.py lab01_report.pdf --no-limit        # chỉ in số trang
+    python3 pdf_pages.py BaoCao_LAB01_B23DCKH105.pdf          # giới hạn mặc định 1..5
+    python3 pdf_pages.py BaoCao_LAB01_B23DCKH105.pdf --min 4  # cần 4–5 trang
+    python3 pdf_pages.py myfile.pdf --no-limit                 # chỉ in số trang
+
+`make_report.py` dùng hàm `pages_via_regex()` trong tệp này để tự kiểm tra số trang.
 
 Ưu tiên `pdfinfo` (poppler-utils) nếu có, nếu không thì đọc trực tiếp cấu trúc PDF
 (đếm object /Type /Page, không tính /Pages). Chạy sau khi compile để biết ngay báo cáo
@@ -62,7 +64,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Đếm số trang PDF")
     ap.add_argument("pdf", type=Path)
     ap.add_argument("--min", type=int, default=1)
-    ap.add_argument("--max", type=int, default=3)
+    ap.add_argument("--max", type=int, default=5)
     ap.add_argument("--no-limit", action="store_true", help="không kiểm tra giới hạn")
     args = ap.parse_args()
 
@@ -83,12 +85,11 @@ def main() -> int:
     if args.no_limit:
         return 0
     if n < args.min:
-        print(f"[!] Ít hơn {args.min} trang — đề yêu cầu {args.min}–{args.max} trang.")
+        print(f"[!] Ít hơn {args.min} trang — báo cáo cần {args.min}–{args.max} trang.")
         return 1
     if n > args.max:
-        print(f"[!] VƯỢT {args.max} trang — cần rút gọn. Xem 'Co giãn độ dài' "
-              f"trong report/README.md (bỏ mục Lệnh tái lập, giảm \\footnotesize, "
-              f"bớt Bảng {args.max}).")
+        print(f"[!] VƯỢT {args.max} trang — cần rút gọn. Xem 'Vì sao giới hạn 5 trang' "
+              f"trong report/README.md (bớt gạch đầu dòng ở mục 4–6).")
         return 1
     print(f"[ok] Nằm trong giới hạn {args.min}–{args.max} trang.")
     return 0
