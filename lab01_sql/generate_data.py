@@ -23,6 +23,8 @@ import random
 import sqlite3
 import sys
 from datetime import date, timedelta
+
+import utf8_console  # noqa: F401 - bật UTF-8 cho Windows
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent

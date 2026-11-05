@@ -15,6 +15,18 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Windows/Git Bash có thể không có `python3`; ưu tiên python3 rồi mới tới python
+PYTHON="${PYTHON:-}"
+if [[ -z "$PYTHON" ]]; then
+  for cand in python3 python py; do
+    if command -v "$cand" >/dev/null 2>&1; then PYTHON="$cand"; break; fi
+  done
+fi
+if [[ -z "$PYTHON" ]]; then
+  echo "[!] Không tìm thấy Python. Cài Python 3 rồi chạy lại." >&2
+  exit 2
+fi
+
 MSSV="${1:-StudentID}"
 OUT_DIR="../submission"
 STAGE="$(mktemp -d)"
@@ -25,19 +37,19 @@ mkdir -p "$ROOT"/{data,sql,report,evidence}
 
 # --- dữ liệu: dựng lại từ nguồn để ZIP không chứa dữ liệu cũ ---
 echo "[i] dựng lại CSDL ..."
-python3 build_db.py --force >/dev/null
-python3 generate_data.py --force >/dev/null
+"$PYTHON" build_db.py --force >/dev/null
+"$PYTHON" generate_data.py --force >/dev/null
 
 cp data/sales.db                  "$ROOT/data/sales.db"
 cp data/sales_extended.db         "$ROOT/data/sales_extended.db"
-cp sql_console.py build_db.py generate_data.py run_sql.py "$ROOT/"
+cp sql_console.py build_db.py generate_data.py run_sql.py utf8_console.py "$ROOT/"
 cp sql/schema.sql sql/seed.sql sql/answers.sql sql/answers_homework.sql sql/explain.sql "$ROOT/sql/"
 
 # --- báo cáo PDF 4–5 trang ---
 PDF="$(ls report/BaoCao_LAB01_*.pdf 2>/dev/null | head -n1 || true)"
 if [[ -z "$PDF" ]]; then
   echo "[i] chưa có PDF, đang xuất bằng report/make_report.py ..."
-  python3 report/make_report.py --images evidence >/dev/null || true
+  "$PYTHON" report/make_report.py --images evidence >/dev/null || true
   PDF="$(ls report/BaoCao_LAB01_*.pdf 2>/dev/null | head -n1 || true)"
 fi
 if [[ -n "$PDF" ]]; then
@@ -69,6 +81,7 @@ Ngày đóng gói: $(date +%F)
   build_db.py .............. dựng sales.db từ sql/schema.sql + sql/seed.sql
   generate_data.py ......... sinh dữ liệu mở rộng 100/30/500/1500 (random.seed = 2026)
   run_sql.py ............... chạy file .sql bằng Python khi máy không có sqlite3 CLI
+  utf8_console.py .......... ép stdout UTF-8 để in tiếng Việt trên Windows (cp1252)
   data/sales_extended.db ... dữ liệu mở rộng (dùng cho S16–S21)
   report/*_report.pdf ...... báo cáo 5 trang theo 5 tiêu chí chấm, chèn đủ 11 ảnh
   evidence/*.png ........... 11 ảnh chụp thật trên Google Cloud Shell (xem mục 7 báo cáo)
@@ -84,11 +97,27 @@ EOF
 mkdir -p "$OUT_DIR"
 ZIP="$OUT_DIR/${MSSV}_SQL.zip"
 rm -f "$ZIP"
-( cd "$STAGE" && zip -qr "$(cd - >/dev/null && pwd)/$ZIP" "${MSSV}_SQL" )
+ABS_ZIP="$(cd "$(dirname "$OUT_DIR")" && pwd)/${OUT_DIR##*/}/${MSSV}_SQL.zip"
+ZIP_BIN="${ZIP_BIN-$(command -v zip || true)}"   # ZIP_BIN="" để buộc dùng Python zipfile
+if [[ -n "$ZIP_BIN" ]]; then
+  ( cd "$STAGE" && "$ZIP_BIN" -qr "$ABS_ZIP" "${MSSV}_SQL" )
+else
+  echo "[i] không có lệnh zip — dùng Python zipfile"
+  "$PYTHON" - "$STAGE" "${MSSV}_SQL" "$ABS_ZIP" <<'PYZIP'
+import sys, zipfile
+from pathlib import Path
+
+stage, folder, out = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+    for path in sorted((stage / folder).rglob("*")):
+        if path.is_file():
+            z.write(path, path.relative_to(stage).as_posix())
+PYZIP
+fi
 
 echo
 echo "[ok] $ZIP"
-python3 - "$ZIP" <<'PY'
+"$PYTHON" - "$ZIP" <<'PY'
 import sys, zipfile
 z = zipfile.ZipFile(sys.argv[1])
 total = sum(i.file_size for i in z.infolist())

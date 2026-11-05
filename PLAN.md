@@ -80,6 +80,8 @@ chứng minh index ở `sql/explain.sql`. Chi tiết kết quả đã kiểm ch�
       `06_expanded_counts.png`, `07_s19_rank_01–03`); PDF 5 trang đã chèn đủ 11 ảnh.
 - [x] Đầu báo cáo chỉ giữ môn học + sinh viên/MSSV (đã bỏ dòng lớp, GVHD và ngày thực hiện).
 - [x] `pack_submission.sh` đóng `submission/StudentID_SQL.zip`, đã giải nén và chạy lại độc lập.
+- [x] Chạy được trên Windows: thêm `utf8_console.py` (bật UTF-8, hết `UnicodeEncodeError` cp1252),
+      `pack_submission.sh` tự chọn `python3`/`python`/`py` và fallback `zipfile` khi thiếu `zip`.
 - [x] **Đã bỏ** hướng báo cáo đồ án 37 trang (LaTeX + bìa/mục lục/phụ lục) và pipeline sinh ảnh
       giả bằng script — thay bằng báo cáo ngắn + ảnh chụp thật.
 
