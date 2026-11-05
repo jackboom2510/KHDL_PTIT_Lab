@@ -21,7 +21,6 @@ from __future__ import annotations
 import argparse
 import sys
 import unicodedata
-from datetime import date
 from pathlib import Path
 
 from fpdf import FPDF
@@ -34,8 +33,6 @@ SQL_DIR = LAB / "sql"
 # ----------------------------------------------------------------- thông tin người làm
 AUTHOR = "Nguyễn Danh Thái"
 STUDENT_ID = "B23DCKH105"
-CLASS_NAME = "...................."
-INSTRUCTOR = "...................."
 
 # ----------------------------------------------------------------- khổ chữ (đen trắng)
 BODY = 11.0
@@ -307,8 +304,6 @@ def title_block(r: Report) -> None:
     for line in (
         "Môn: Introduction to Data Science — Học viện Công nghệ Bưu chính Viễn thông",
         f"Sinh viên: {AUTHOR}    MSSV: {STUDENT_ID}",
-        f"Lớp: {CLASS_NAME}    GVHD: {INSTRUCTOR}",
-        f"Ngày thực hiện: {date.today().strftime('%d/%m/%Y')}",
     ):
         r.multi_cell(0, 5.0, line, align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     r.ln(1.6)
