@@ -56,7 +56,8 @@ cp evidence/*.png "$ROOT/evidence/" 2>/dev/null || true
 # --- bản đồ ánh xạ yêu cầu đề bài -> file ---
 cat > "$ROOT/README_MAPPING.txt" <<EOF
 LAB 01 — SQL trên Google Cloud Shell với SQLite
-Sinh viên: ${MSSV}
+Sinh viên: Nguyễn Danh Thái — MSSV: ${MSSV}
+Môn: Introduction to Data Science — Học viện Công nghệ Bưu chính Viễn thông
 Ngày đóng gói: $(date +%F)
 
 ÁNH XẠ YÊU CẦU -> FILE
@@ -69,7 +70,7 @@ Ngày đóng gói: $(date +%F)
   generate_data.py ......... sinh dữ liệu mở rộng 100/30/500/1500 (random.seed = 2026)
   run_sql.py ............... chạy file .sql bằng Python khi máy không có sqlite3 CLI
   data/sales_extended.db ... dữ liệu mở rộng (dùng cho S16–S21)
-  report/*_report.pdf ...... báo cáo 4–5 trang theo 5 tiêu chí chấm, có ảnh minh chứng
+  report/*_report.pdf ...... báo cáo 5 trang theo 5 tiêu chí chấm, chèn đủ 11 ảnh
   evidence/*.png ........... 11 ảnh chụp thật trên Google Cloud Shell (xem mục 7 báo cáo)
 
 CHẠY LẠI
