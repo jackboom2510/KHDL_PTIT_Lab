@@ -63,3 +63,7 @@ Thumbs.db
 
 # Ảnh minh chứng / PDF (bản .tmp khi xuất lại báo cáo)
 lab01_sql/report/*_pdf.pdf.tmp
+
+# Kết quả chạy N01–N22 (sinh lại bằng check_offline.py hoặc trên Atlas)
+lab02_nosql/data/lab02_results_*.json
+lab02_nosql/report/*.tmp

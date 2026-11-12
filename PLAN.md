@@ -1,7 +1,7 @@
 # PLAN — KHDL PTIT Lab 01 & Lab 02
 
-Trạng thái: **LAB 01 đã xong M1–M3** (S01–S21 chạy được, tách file bắt buộc/bổ sung);
-LAB 02 còn ở M4.
+Trạng thái: **cả hai lab đã có code chạy được và báo cáo PDF**; phần còn lại là chạy thật trên
+Atlas + chụp ảnh minh chứng (LAB 02) rồi đóng ZIP nộp bài.
 Nguồn yêu cầu: hai PDF ở thư mục gốc. Chi tiết trích đề: `docs/lab01_requirements.md`,
 `docs/lab02_requirements.md`.
 
@@ -13,9 +13,9 @@ Nguồn yêu cầu: hai PDF ở thư mục gốc. Chi tiết trích đề: `docs
 | M1 | LAB 01 — dựng `sales.db`, console, CRUD, câu cơ bản (S01–S07) | ✅ |
 | M2 | LAB 01 — truy vấn nâng cao S08–S13 | ✅ |
 | M3 | LAB 01 — index/EXPLAIN S14–S15 + mở rộng dữ liệu S16–S21 | ✅ |
-| M4 | LAB 02 — Atlas, seed, CRUD, filter (N01–N09) | ⬜ |
-| M5 | LAB 02 — aggregation, `$lookup`, index, homework (N10–N22) | ⬜ |
-| M6 | Báo cáo PDF ngắn + ảnh minh chứng + đóng ZIP nộp bài | ✅ (LAB 01: PDF 5 trang + 11 ảnh + ZIP đã kiểm chứng) |
+| M4 | LAB 02 — `connect.py`, `seed.py`, CRUD/filter (N01–N09) | ✅ (đã kiểm bằng `check_offline.py`) |
+| M5 | LAB 02 — aggregation, `$lookup`, index, homework (N10–N22) | ✅ (đã kiểm bằng `check_offline.py`) |
+| M6 | Báo cáo PDF ngắn + ảnh minh chứng + đóng ZIP nộp bài | ✅ LAB 01 (5 trang, 11 ảnh, ZIP) · 🔄 LAB 02 (PDF 4 trang xong, chờ 7 ảnh Atlas) |
 
 ## 1. LAB 01 — SQL / SQLite
 
@@ -100,48 +100,67 @@ allowlist. **Không lưu URI/mật khẩu vào repo.**
 
 ### 2.1 Thiết lập
 
-- [ ] Tạo cluster free, ghi lại provider/region vào báo cáo.
-- [ ] `connect.py` dùng `getpass`, ping thành công, trả về db `sales_nosql`.
-- [ ] `seed.py` seed `customers`/`products`/`orders` (embedded `items`), chặn chạy lại khi có dữ liệu.
-- [ ] `lab_queries.py` chạy đúng các ví dụ trong PDF.
-- [ ] Ảnh Data Explorer mở một order thấy mảng `items` → `evidence/02_data_explorer.png`.
+- [x] `connect.py` — `getpass` (hoặc `MONGO_URI` cho CI), `serverSelectionTimeoutMS=12000`, `ping`,
+      trả về db `sales_nosql`; phân biệt timeout / AuthenticationFailed / URI sai.
+- [x] `seed.py` — seed `customers`/`products`/`orders` (items nhúng), dừng khi đã có dữ liệu.
+- [x] `lab_queries.py` — chạy đúng các ví dụ CRUD/truy vấn mục 7 của PDF, có dọn dữ liệu.
+- [x] `check_offline.py` — chạy thử N01–N22 bằng `mongomock`, ghi JSON kết quả cho báo cáo.
+- [ ] **(Chờ người làm)** tạo cluster Atlas `DSCluster` M0, allowlist IP Cloud Shell, chạy
+      `connect.py`/`seed.py` và chụp `evidence/01_cluster.png`, `evidence/02_data_explorer.png`.
 
 ### 2.2 Bài bắt buộc (`n_answers.py`)
 
 | Mã | Yêu cầu | Ghi chú kỹ thuật | Trạng thái |
 | --- | --- | --- | --- |
-| N01 | Liệt kê tất cả customers | `find({}, {'_id':0})` | ⬜ |
-| N02 | Khách ở Hanoi | filter `{'city':'Hanoi'}` | ⬜ |
-| N03 | Sản phẩm giá > 1 triệu | `{'price':{'$gt':1000000}}` | ⬜ |
-| N04 | Sắp xếp giá giảm dần | `.sort('price', -1)` | ⬜ |
-| N05 | Thêm khách mới | `insert_one` | ⬜ |
-| N06 | Sửa thành phố | `update_one` + `$set` | ⬜ |
-| N07 | Xoá khách vừa thêm | `delete_one` | ⬜ |
-| N08 | Đếm khách theo thành phố | `$group` + `$sum: 1` | ⬜ |
-| N09 | Đơn chứa Laptop | `{'items.product_id':101}` | ⬜ |
-| N10 | Tổng tiền từng đơn | `$unwind` + `$group` + `$multiply` | ⬜ |
-| N11 | Doanh thu theo khách | `$group` theo `customer_id` | ⬜ |
-| N12 | Ghép orders với customers | `$lookup` + `$unwind` + `$project` | ⬜ |
-| N13 | Khách có ≥2 đơn | `$group` + `$match` count | ⬜ |
-| N14 | Index `orders.customer_id` | `create_index('customer_id')` | ⬜ |
-| N15 | Giải thích embedded vs reference | viết trong báo cáo, không chỉ code | ⬜ |
+| N01 | Liệt kê tất cả customers | `find({}, {'_id':0})` | ✅ |
+| N02 | Khách ở Hanoi | filter `{'city':'Hanoi'}` | ✅ |
+| N03 | Sản phẩm giá > 1 triệu | `{'price':{'$gt':1000000}}` | ✅ |
+| N04 | Sắp xếp giá giảm dần | `.sort('price', -1)` | ✅ |
+| N05 | Thêm khách mới | `insert_one` | ✅ |
+| N06 | Sửa thành phố | `update_one` + `$set` | ✅ |
+| N07 | Xoá khách vừa thêm | `delete_one` | ✅ |
+| N08 | Đếm khách theo thành phố | `$group` + `$sum: 1` | ✅ |
+| N09 | Đơn chứa Laptop | `{'items.product_id':101}` | ✅ |
+| N10 | Tổng tiền từng đơn | `$unwind` + `$group` + `$multiply` | ✅ |
+| N11 | Doanh thu theo khách | `$group` theo `customer_id` | ✅ |
+| N12 | Ghép orders với customers | `$lookup` + `$unwind` + `$project` | ✅ |
+| N13 | Khách có ≥2 đơn | `$group` + `$match` count | ✅ |
+| N14 | Index `orders.customer_id` | `create_index('customer_id')` | ✅ |
+| N15 | Giải thích embedded vs reference | viết trong báo cáo, không chỉ code | ✅ |
 
 ### 2.3 Bài bổ sung
 
-- [ ] `generate_data.py`: ≥500 đơn, mỗi đơn 1–5 sản phẩm; nạp lên Atlas.
-- [ ] N16 doanh thu theo thành phố.
-- [ ] N17 top 3 sản phẩm theo doanh thu.
-- [ ] N18 khách chưa đặt hàng qua `$lookup` + `$match` rỗng.
-- [ ] N19 thêm `discount` không đồng nhất giữa các document, xử lý thiếu bằng `$ifNull`.
-- [ ] N20 phân tích nhúng vs tham chiếu + hệ quả: đổi `products.price` không cập nhật
-      `items.price` trong đơn cũ.
-- [ ] N21 tạo index và đọc `explain()` (nêu rõ dữ liệu nhỏ nên chưa kết luận tốc độ).
-- [ ] N22 đối chiếu `JOIN` (SQL) với `$lookup` (MongoDB).
+- [x] `generate_data.py`: 100 khách / 30 sản phẩm / 500 đơn / 1.521 dòng items, `seed=2026`,
+      8 khách không có đơn, 4 sản phẩm không bán được; `--force` / `--dry-run`.
+- [x] N16 doanh thu theo thành phố (7 thành phố).
+- [x] N17 top 3 sản phẩm theo doanh thu: Laptop Pro, Ultrabook, Laptop.
+- [x] N18 khách chưa đặt hàng qua `$lookup` + `$match` mảng rỗng: 8 khách.
+- [x] N19 `discount` không đồng nhất (251 đơn có, 255 đơn không), `$ifNull` quy thiếu về 0.
+- [x] N20 phân tích nhúng vs tham chiếu; đổi `products.price` 15 → 16 triệu, `items.price`
+      trong đơn cũ vẫn 15 triệu (script tự khôi phục giá gốc).
+- [x] N21 tạo index + đọc `explain()` (`IXSCAN` vs `COLLSCAN`), nêu rõ dữ liệu nhỏ nên không
+      kết luận bằng thời gian.
+- [x] N22 đối chiếu `JOIN` (SQL) với `$lookup` (MongoDB), cùng trả 506 dòng ghép.
 
 ### 2.4 Nộp
 
-`StudentID_NoSQL.zip` = `connect.py`, `seed.py`, `lab_queries.py`, file giải N01–N22,
-báo cáo PDF 2–3 trang + ảnh Data Explorer và ảnh terminal.
+- [x] `report/make_report.py` — báo cáo **ngắn 4–5 trang, đen trắng**, bám 5 tiêu chí chấm;
+      đọc số liệu từ JSON (`--results`) và ảnh chụp thật (`--images`), tự thu nhỏ ảnh nếu > 5 trang.
+- [x] `report/BaoCao_LAB02_B23DCKH105.pdf` — 4 trang khi chưa chèn ảnh.
+- [x] `evidence/HUONG_DAN_CHUP_ANH.md` — 7 ảnh cần chụp (Atlas + Cloud Shell) và lệnh cụ thể.
+- [x] `pack_submission.sh` — chặn đóng gói nếu phát hiện URI/mật khẩu, tự chọn `zip`/`zipfile`.
+- [ ] **(Chờ người làm)** chụp 7 ảnh thật, chạy lại trên Atlas, xuất lại PDF có ảnh và đóng ZIP:
+
+```bash
+python3 lab02_nosql/report/make_report.py --images lab02_nosql/evidence \
+    --results lab02_nosql/data/lab02_results_n01_n15.json \
+              lab02_nosql/data/lab02_results_n16_n22.json
+bash lab02_nosql/pack_submission.sh B23DCKH105
+```
+
+`StudentID_NoSQL.zip` gồm `connect.py`, `seed.py`, `lab_queries.py`, `n_answers.py` (N01–N15),
+`n_homework.py` (N16–N22), `generate_data.py`, `check_offline.py`, `utf8_console.py`,
+báo cáo PDF + 7 ảnh minh chứng, `README_MAPPING.txt`.
 
 ## 3. Rủi ro & lưu ý
 

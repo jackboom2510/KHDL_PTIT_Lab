@@ -27,7 +27,11 @@
 | `lab_queries.py` | Các ví dụ CRUD/aggregation đúng như PDF mục 7 và 9 | ✅ |
 | `n_answers.py` | Giải **N01–N15** (bắt buộc), mỗi câu một hàm `n01()`, `n02()`… in kết quả | ✅ |
 | `n_homework.py` | Giải **N16–N22** (bổ sung/về nhà), cùng quy ước hàm và nhãn `=== N16 ===` | ✅ |
-| `generate_data.py` | Sinh ≥500 đơn, mỗi đơn 1–5 sản phẩm, `customer_id`/`product_id` hợp lệ | ✅ |
+| `generate_data.py` | 100 khách / 30 SP / 500 đơn / 1.521 dòng items, `random.seed(2026)` | ✅ |
+| `check_offline.py` | Chạy N01–N22 bằng `mongomock` (không cần Atlas), ghi JSON cho báo cáo | — |
+| `utf8_console.py` | Ép `stdout` UTF-8 (Windows cp1252) | — |
+| `report/make_report.py` | Sinh báo cáo PDF 4–5 trang đen trắng theo 5 tiêu chí | — |
+| `pack_submission.sh` | Đóng `submission/StudentID_NoSQL.zip`, chặn nếu có secret | — |
 | `data/` | File JSON trung gian nếu cần — không commit | — |
 
 ### Tách phần bắt buộc và phần bổ sung
@@ -71,11 +75,14 @@ Giống LAB 01, hai phần **không trộn file**:
 
 ## Báo cáo và minh chứng
 
-- `evidence/`: `01_cluster.png`, `02_data_explorer.png` (mở 1 order thấy `items`),
-  `03_crud.png`, `04_aggregation_n10.png`, `05_lookup_n12.png`, `06_explain_n21.png`
-  (đã che thông tin nhạy cảm).
-- Báo cáo `report/lab02_report.md` → PDF 2–3 trang: thiết lập Atlas → mô hình embedded →
-  kết quả N01–N14 → homework N16–N22 → so sánh SQL vs MongoDB.
+- Ảnh phải là ảnh chụp **thật** trên Atlas + Cloud Shell, **không** dựng lại bằng script.
+  Danh sách lệnh và nội dung cần thấy: `evidence/HUONG_DAN_CHUP_ANH.md`.
+- Tên tệp cố định: `01_cluster.png`, `02_data_explorer.png`, `03_crud.png`,
+  `04_aggregation_n10.png`, `05_lookup_n12.png`, `06_explain_n21.png`, `07_expanded_counts.png`
+  — khớp mục 7 của báo cáo.
+- Báo cáo: `python3 report/make_report.py --images evidence --results data/*.json` → PDF 4–5
+  trang đen trắng, 8 mục: thông tin chung → 5 tiêu chí chấm → danh mục ảnh → kết luận.
+  Số liệu lấy từ JSON do `n_answers.py` / `n_homework.py` xuất ra, không viết tay.
 
 ## Kiểm tra trước khi nộp
 
