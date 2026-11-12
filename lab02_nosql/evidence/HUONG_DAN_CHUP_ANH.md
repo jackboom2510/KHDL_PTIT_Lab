@@ -63,6 +63,20 @@ Cùng màn hình trên, chụp phần **N10** (bảng `order_id` + `total`). Cu�
 
 Chụp phần **N12** (`$lookup` + `$unwind` → `{order_id, name, city}`) — nên thấy 6 dòng ghép.
 
+## Bước 2 — dữ liệu mở rộng (làm trước ảnh 6 và ảnh 7)
+
+`n_homework.py` yêu cầu ≥ 100 đơn, nên phải nạp dữ liệu mở rộng **trước**:
+
+```bash
+python3 generate_data.py --force
+```
+
+## Ảnh 7 — `07_expanded_counts.png`
+
+Chụp ngay phần thống kê của lần chạy trên: `seed = 2026`, 100 khách / 30 sản phẩm / 500 đơn /
+1.521 dòng items / 8 khách chưa có đơn / 4 sản phẩm chưa bán, và phần **"Sau khi nạp (trên
+Atlas)"** đếm document của 3 collection. (Chỉ xem lại thống kê mà không ghi: `--dry-run`.)
+
 ## Ảnh 6 — `06_explain_n21.png`
 
 ```bash
@@ -71,15 +85,6 @@ python3 n_homework.py --json data/lab02_results_n16_n22.json
 
 Chụp phần **N21**: `explain_customer_id` có `stage: IXSCAN`, `index_name: idx_orders_customer`;
 `explain_no_index_field` có `stage: COLLSCAN`.
-
-## Ảnh 7 — `07_expanded_counts.png`
-
-```bash
-python3 generate_data.py --force
-```
-
-Chụp phần thống kê (100 khách / 30 sản phẩm / 500 đơn / 1.521 dòng items / 8 khách chưa đơn /
-4 sản phẩm chưa bán) và phần đếm document sau khi nạp.
 
 ---
 
