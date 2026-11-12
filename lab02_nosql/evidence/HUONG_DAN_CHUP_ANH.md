@@ -83,6 +83,20 @@ Chụp phần thống kê (100 khách / 30 sản phẩm / 500 đơn / 1.521 dòn
 
 ---
 
+## Dán ảnh vào bản Word (khung có sẵn)
+
+`lab02_nosql/report/BaoCao_LAB02_B23DCKH105.docx` đã đặt sẵn **7 khung nét đứt** đúng vị trí
+của 7 ảnh trong bảng trên; mỗi khung ghi số hiệu hình, tên tệp cần dán và nội dung phải thấy.
+
+- Cách 1 — dán tay: bấm vào trong khung → *Insert > Pictures* → chọn tệp trong `evidence/`.
+  Khung nét đứt nằm dưới ảnh, xoá khung sau khi dán nếu muốn (bảng chỉ còn ảnh).
+- Cách 2 — chèn tự động khi xuất lại:
+
+```bash
+cd lab02_nosql/report
+python3 make_docx.py --images ../evidence      # ảnh có tệp thì chèn, thiếu thì để khung
+```
+
 ## Xuất lại báo cáo và đóng gói
 
 ```bash
@@ -100,3 +114,5 @@ bash lab02_nosql/pack_submission.sh B23DCKH105
 ```bash
 grep -rniE "mongodb\+srv://|student_lab:" --exclude-dir=.git . || echo "không có secret"
 ```
+
+Ảnh chụp cũng phải kiểm tra: không để lộ URI, mật khẩu, email tài khoản Atlas trong khung hình.

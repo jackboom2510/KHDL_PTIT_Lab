@@ -56,7 +56,7 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   ├── utf8_console.py        # ép stdout UTF-8 (Windows)
 │   ├── pack_submission.sh     # đóng gói submission/StudentID_NoSQL.zip
 │   ├── data/                  # JSON kết quả chạy (không commit)
-│   ├── report/                # make_report.py + PDF 4–5 trang
+│   ├── report/                # make_report.py (PDF) + make_docx.py (Word có khung ảnh)
 │   └── evidence/              # 7 ảnh chụp Atlas/Cloud Shell + hướng dẫn chụp
 └── submission/                # ZIP bài nộp (không commit)
 ```
@@ -176,6 +176,18 @@ python3 lab02_nosql/report/make_report.py \
     --results lab02_nosql/data/lab02_results_n01_n15.json \
               lab02_nosql/data/lab02_results_n16_n22.json
 ```
+
+Bản Word để tự dán ảnh chụp (7 khung nét đứt đặt đúng vị trí ảnh, mỗi khung ghi tên tệp và
+nội dung phải thấy):
+
+```bash
+pip install python-docx
+python3 lab02_nosql/report/make_docx.py                      # khung trống để dán ảnh
+python3 lab02_nosql/report/make_docx.py --images lab02_nosql/evidence   # chèn ảnh đã chụp
+```
+
+Bản Word không nằm trong ZIP nộp bài (ZIP chỉ cần báo cáo PDF); chi tiết:
+[`lab02_nosql/report/README.md`](lab02_nosql/report/README.md).
 
 Ảnh minh chứng (7 ảnh chụp thật trên Atlas + Cloud Shell) xem
 [`lab02_nosql/evidence/HUONG_DAN_CHUP_ANH.md`](lab02_nosql/evidence/HUONG_DAN_CHUP_ANH.md).

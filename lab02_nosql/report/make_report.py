@@ -19,13 +19,14 @@ seed 2026 và cùng pipeline), đủ để xem trước bố cục; số liệu 
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import unicodedata
 from pathlib import Path
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
+
+from report_values import DEFAULTS, FIGURES, load_results, vnd  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):      # Windows: tránh UnicodeEncodeError khi in
     try:
@@ -46,71 +47,6 @@ LH = 5.4
 INDENT = 7.0
 INK = (0, 0, 0)          # chỉ dùng màu đen
 GRAY = (90, 90, 90)      # xám trung tính cho chú thích ảnh, không phải màu nhấn
-
-FIGURES = [
-    "01_cluster.png", "02_data_explorer.png", "03_crud.png",
-    "04_aggregation_n10.png", "05_lookup_n12.png",
-    "06_explain_n21.png", "07_expanded_counts.png",
-]
-
-# Số liệu dự phòng: đo bằng cách chạy chính các pipeline trong n_answers.py / n_homework.py
-# trên cùng bộ dữ liệu seed 2026. Khi có JSON từ Atlas, mọi con số dưới đây được thay thế.
-DEFAULTS = {
-    "n01": [{"customer_id": 1, "name": "An", "city": "Hanoi"},
-            {"customer_id": 2, "name": "Binh", "city": "Hanoi"},
-            {"customer_id": 3, "name": "Chi", "city": "Danang"},
-            {"customer_id": 4, "name": "Dung", "city": "HCMC"},
-            {"customer_id": 5, "name": "Ha", "city": "Hanoi"}],
-    "n02": [{"customer_id": 1, "name": "An", "city": "Hanoi"},
-            {"customer_id": 2, "name": "Binh", "city": "Hanoi"},
-            {"customer_id": 5, "name": "Ha", "city": "Hanoi"}],
-    "n03": [{"product_id": 101, "name": "Laptop", "price": 15000000},
-            {"product_id": 104, "name": "Monitor", "price": 3500000}],
-    "n08": [{"city": "Hanoi", "count": 3}, {"city": "Danang", "count": 1},
-            {"city": "HCMC", "count": 1}],
-    "n09": [{"order_id": 1001}, {"order_id": 1004}],
-    "n10": [{"order_id": 1001, "total": 15500000}, {"order_id": 1004, "total": 15000000},
-            {"order_id": 1006, "total": 7000000}, {"order_id": 1002, "total": 4150000},
-            {"order_id": 1003, "total": 1600000}, {"order_id": 1005, "total": 750000}],
-    "n11": [{"customer_id": 1, "name": "An", "revenue": 17100000},
-            {"customer_id": 3, "name": "Chi", "revenue": 15000000},
-            {"customer_id": 5, "name": "Ha", "revenue": 7000000},
-            {"customer_id": 2, "name": "Binh", "revenue": 4150000},
-            {"customer_id": 4, "name": "Dung", "revenue": 750000}],
-    "n12": [{"order_id": 1001, "name": "An", "city": "Hanoi"}],
-    "n13": [{"customer_id": 1, "name": "An", "order_count": 2}],
-    "n14": {"created": "idx_orders_customer",
-            "indexes_after": [{"name": "_id_"}, {"name": "idx_orders_customer"}]},
-    "n16": [{"city": "Cantho", "revenue": 2318630000, "customers": 16},
-            {"city": "Hue", "revenue": 2291320000, "customers": 15}],
-    "n17": [{"product_id": 106, "name": "Laptop Pro", "revenue": 2728000000, "quantity": 124},
-            {"product_id": 107, "name": "Ultrabook", "revenue": 2090500000, "quantity": 113},
-            {"product_id": 101, "name": "Laptop", "revenue": 2070000000, "quantity": 138}],
-    "n18": [{"customer_id": 93, "name": "Bui Anh Thao", "city": "Hanoi"}],
-    "n19": {"orders_with_discount": 251, "orders_without_discount": 255,
-            "totals": {"gross": 12758940000, "net": 12210157000, "discount_amount": 548783000}},
-    "n20": {"product_price_before": 15000000, "product_price_after_update": 16000000,
-            "price_in_old_order_before": 15000000, "price_in_old_order_after": 15000000,
-            "embedded_copies_price": True},
-    "n21": {"explain_customer_id": {"stage": "IXSCAN", "index_name": "idx_orders_customer"},
-            "explain_no_index_field": {"stage": "COLLSCAN"}},
-    "n22": {"so_dong": 506},
-}
-
-
-def load_results(paths: list[Path]) -> dict:
-    data = json.loads(json.dumps(DEFAULTS))          # deep copy
-    for path in paths:
-        data.update(json.loads(Path(path).read_text(encoding="utf-8")))
-    return data
-
-
-def vnd(value) -> str:
-    try:
-        return f"{int(round(float(value))):,}".replace(",", ".")
-    except (TypeError, ValueError):
-        return str(value)
-
 
 def ascii_only(text: str) -> str:
     """Bỏ dấu tiếng Việt cho khối mã (font mono thiếu một số glyph dựng sẵn)."""
