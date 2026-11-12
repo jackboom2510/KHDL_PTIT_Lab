@@ -147,13 +147,13 @@ allowlist. **Không lưu URI/mật khẩu vào repo.**
 - [x] `report/make_report.py` — báo cáo **ngắn 4–5 trang, đen trắng**, bám 5 tiêu chí chấm;
       đọc số liệu từ JSON (`--results`) và ảnh chụp thật (`--images`), tự thu nhỏ ảnh nếu > 5 trang.
 - [x] `report/BaoCao_LAB02_B23DCKH105.pdf` — 4 trang khi chưa chèn ảnh.
-- [x] `report/make_docx.py` — bản **Word** cùng nội dung, có **7 khung nét đứt** đặt đúng vị trí
-      ảnh (ghi số hình, tên tệp, nội dung phải thấy); `--images` để chèn ảnh đã chụp,
-      `--results` để lấy số liệu lần chạy thật.
+- [x] `report/make_docx.py` — bản **Word** cùng nội dung; `--images` chèn 12 ảnh chụp, thiếu ảnh
+      thì để khung nét đứt ghi số hình, tên tệp, nội dung phải thấy; `--results` lấy số liệu thật.
 - [x] `report/report_values.py` — số liệu, danh sách ảnh và chú thích dùng chung cho PDF + Word.
 - [x] `evidence/HUONG_DAN_CHUP_ANH.md` — 7 ảnh cần chụp (Atlas + Cloud Shell) và lệnh cụ thể.
 - [x] `pack_submission.sh` — chặn đóng gói nếu phát hiện URI/mật khẩu, tự chọn `zip`/`zipfile`.
-- [ ] **(Chờ người làm)** chụp 7 ảnh thật, chạy lại trên Atlas, xuất lại PDF có ảnh và đóng ZIP:
+- [x] 12 ảnh chụp thật (Cloud Shell + Atlas) đã chuẩn hoá vào `evidence/`, chèn vào PDF và DOCX.
+- [ ] **(Chờ người làm)** đóng ZIP bài nộp:
 
 ```bash
 python3 lab02_nosql/report/make_report.py --images lab02_nosql/evidence \

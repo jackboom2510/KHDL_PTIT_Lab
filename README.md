@@ -57,7 +57,7 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   ├── pack_submission.sh     # đóng gói submission/StudentID_NoSQL.zip
 │   ├── data/                  # JSON kết quả chạy (không commit)
 │   ├── report/                # make_report.py (PDF) + make_docx.py (Word có khung ảnh)
-│   └── evidence/              # 7 ảnh chụp Atlas/Cloud Shell + hướng dẫn chụp
+│   └── evidence/              # 12 ảnh chụp Atlas/Cloud Shell + script chuẩn hoá ảnh
 └── submission/                # ZIP bài nộp (không commit)
 ```
 
@@ -177,8 +177,8 @@ python3 lab02_nosql/report/make_report.py \
               lab02_nosql/data/lab02_results_n16_n22.json
 ```
 
-Bản Word để tự dán ảnh chụp (7 khung nét đứt đặt đúng vị trí ảnh, mỗi khung ghi tên tệp và
-nội dung phải thấy):
+Bản Word cùng nội dung (12 ảnh đã chèn; nếu thiếu ảnh thì để khung nét đứt ghi tên tệp và nội
+dung phải thấy để dán tay):
 
 ```bash
 pip install python-docx

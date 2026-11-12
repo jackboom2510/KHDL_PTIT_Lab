@@ -6,13 +6,21 @@
 
 | Tệp | Nội dung cần thấy | Mục báo cáo |
 | --- | --- | --- |
-| `01_cluster.png` | Atlas: cluster `DSCluster` (Free/M0), database `sales_nosql`, 3 collection | 2 — Thiết lập, seed |
-| `02_data_explorer.png` | Data Explorer mở một document `orders` thấy mảng `items` | 2 — Thiết lập, seed |
-| `03_crud.png` | Terminal: `n_answers.py` in N01–N08 | 3 — CRUD, filter |
-| `04_aggregation_n10.png` | Terminal: N10 với `$unwind`/`$group` | 4 — Aggregation |
-| `05_lookup_n12.png` | Terminal: N12 `$lookup` + `$unwind` | 4 — Aggregation |
-| `06_explain_n21.png` | Terminal: `explain()` ra `IXSCAN` và `COLLSCAN` | 5 — Index, mô hình |
-| `07_expanded_counts.png` | Terminal: `generate_data.py` + đếm 100/30/500/1.521 | 6 — Mở rộng |
+| `01_cluster.png` | Atlas: Data Explorer > `DBCluster` > `sales_nosql` với `customers` (100), `products` (30), `orders` (506) | 2 — Thiết lập, seed |
+| `02_data_explorer.png` | Mở document `order_id 1001` thấy mảng `items` gồm `{product_id, name, price, quantity}` | 2 — Thiết lập, seed |
+| `03_connect_seed.png` | Terminal: `connect.py` (3 collection rỗng) rồi `seed.py` (5/5/6 + mẫu items) | 2 — Thiết lập, seed |
+| `04_crud_n01_n05.png` | Terminal: N01–N05 | 3 — CRUD, filter |
+| `05_crud_n05_n11.png` | Terminal: N05–N11 (insert/update/delete, N08, N09, N10, N11) | 3, 4 |
+| `07_lookup_n12.png` | Terminal: N12 `$lookup` + `$unwind`, 6 dòng ghép | 4 — Aggregation |
+| `08_n13_n14_index.png` | Terminal: N13 lọc sau `$group`, N14 tạo `idx_orders_customer` | 3 — CRUD, filter |
+| `09_n15_n20_mo_hinh.png` | Terminal: N15 (embedded vs reference) và N20 (đổi giá products) | 5 — Index, mô hình |
+| `10_explain_n21.png` | Terminal: N21 `explain_customer_id` (index, `docs_examined` 7) và `explain_no_index_field` (`COLLSCAN`, 506) | 5 — Index, mô hình |
+| `11_expanded_counts.png` | Terminal: `generate_data.py --force` — 100/30/500/1.521 + bảng đếm sau khi nạp (`orders` 506) | 6 — Mở rộng |
+| `12_n16_n19.png` | Terminal: N16, N17, N18, N19 | 6 — Mở rộng |
+| `13_n22_lookup.png` | Terminal: N22 pipeline `$lookup` và `so_dong` 506 | 6 — Mở rộng |
+
+Số hiệu tệp giữ đúng thứ tự câu hỏi, nên có thể ghép nhiều lần chụp của cùng một mục thành một
+tệp (xem `prepare_evidence.py`).
 
 **Che thông tin nhạy cảm**: đừng để lộ mật khẩu/URI trong ảnh. `getpass` không hiển thị URI nên
 chỉ cần không mở file chứa URI khi chụp.
@@ -36,32 +44,15 @@ python3 seed.py                     # customers 5, products 5, orders 6
 python3 lab_queries.py
 ```
 
-## Ảnh 1 — `01_cluster.png`
-
-Atlas → **Database**: thấy `DSCluster` nhãn *Free*, region đã chọn; mở **Browse Collections**
-thấy database `sales_nosql` với `customers`, `products`, `orders`.
-
-## Ảnh 2 — `02_data_explorer.png`
-
-Atlas → Browse Collections → `sales_nosql.orders` → mở document `order_id: 1001`: `items` là
-array 2 document `{product_id, name, price, quantity}`. Chụp cả phần đầu document.
-
-## Ảnh 3 — `03_crud.png`
+## Bước 1 — phần bắt buộc (ảnh 3–5, 7–9)
 
 ```bash
 python3 n_answers.py --json data/lab02_results_n01_n15.json
 ```
 
-Chụp phần N01–N08 (danh sách khách, khách Hanoi, sản phẩm > 1 triệu, kết quả insert/update/delete).
-
-## Ảnh 4 — `04_aggregation_n10.png`
-
-Cùng màn hình trên, chụp phần **N10** (bảng `order_id` + `total`). Cuộn để thấy đơn 1001 =
-15.500.000 và tổng 6 đơn.
-
-## Ảnh 5 — `05_lookup_n12.png`
-
-Chụp phần **N12** (`$lookup` + `$unwind` → `{order_id, name, city}`) — nên thấy 6 dòng ghép.
+Chụp màn hình cuộn dần: **N01–N05** → `04_crud_n01_n05.png`; **N05–N11** (thấy cả N10 tổng
+44.000.000) → `05_crud_n05_n11.png`; **N12** → `07_lookup_n12.png`; **N13 và N14** →
+`08_n13_n14_index.png`; **N15** → phần trên của `09_n15_n20_mo_hinh.png`.
 
 ## Bước 2 — dữ liệu mở rộng (làm trước ảnh 6 và ảnh 7)
 
@@ -71,48 +62,52 @@ Chụp phần **N12** (`$lookup` + `$unwind` → `{order_id, name, city}`) — n
 python3 generate_data.py --force
 ```
 
-## Ảnh 7 — `07_expanded_counts.png`
+## Ảnh 11 — `11_expanded_counts.png`
 
 Chụp ngay phần thống kê của lần chạy trên: `seed = 2026`, 100 khách / 30 sản phẩm / 500 đơn /
 1.521 dòng items / 8 khách chưa có đơn / 4 sản phẩm chưa bán, và phần **"Sau khi nạp (trên
 Atlas)"** đếm document của 3 collection. (Chỉ xem lại thống kê mà không ghi: `--dry-run`.)
 
-## Ảnh 6 — `06_explain_n21.png`
+## Bước 3 — phần bổ sung (ảnh 9–13)
 
 ```bash
 python3 n_homework.py --json data/lab02_results_n16_n22.json
 ```
 
-Chụp phần **N21**: `explain_customer_id` có `stage: IXSCAN`, `index_name: idx_orders_customer`;
-`explain_no_index_field` có `stage: COLLSCAN`.
+Chụp **N16–N19** → `12_n16_n19.png`; **N20** → phần dưới của `09_n15_n20_mo_hinh.png`; **N21**
+→ `10_explain_n21.png` (phải thấy `idx_orders_customer`, `docs_examined` 7 so với `COLLSCAN`
+`docs_examined` 506); **N22** → `13_n22_lookup.png`.
+
+## Ảnh 1–2 — trên Atlas
+
+Atlas → **Data Explorer**: chụp `DBCluster > sales_nosql` với 3 collection → `01_cluster.png`;
+mở `orders` → document `order_id: 1001` thấy `items` là array 2 document → `02_data_explorer.png`.
 
 ---
 
-## Dán ảnh vào bản Word (khung có sẵn)
+## Chuẩn hoá ảnh trước khi đưa vào báo cáo
 
-`lab02_nosql/report/BaoCao_LAB02_B23DCKH105.docx` đã đặt sẵn **7 khung nét đứt** đúng vị trí
-của 7 ảnh trong bảng trên; mỗi khung ghi số hiệu hình, tên tệp cần dán và nội dung phải thấy.
-
-- Cách 1 — dán tay: bấm vào trong khung → *Insert > Pictures* → chọn tệp trong `evidence/`.
-  Khung nét đứt nằm dưới ảnh, xoá khung sau khi dán nếu muốn (bảng chỉ còn ảnh).
-- Cách 2 — chèn tự động khi xuất lại:
+`prepare_evidence.py` **không** tạo nội dung ảnh: nó chỉ cắt khoảng trống thừa ở mép, ghép các
+lần chụp liên tiếp của cùng một mục và lưu ra đúng tên tệp ở bảng trên.
 
 ```bash
-cd lab02_nosql/report
-python3 make_docx.py --images ../evidence      # ảnh có tệp thì chèn, thiếu thì để khung
+python3 prepare_evidence.py --src ~/Pictures/lab02 --dry-run   # kiểm tra đủ ảnh nguồn
+python3 prepare_evidence.py --src ~/Pictures/lab02             # ghi ảnh đã chuẩn hoá
 ```
+
+Sửa bảng `MAP` trong script nếu tên ảnh chụp gốc khác quy ước.
 
 ## Xuất lại báo cáo và đóng gói
 
 ```bash
 # từ gốc repo
-python3 lab02_nosql/report/make_report.py \
-    --images lab02_nosql/evidence \
-    --results lab02_nosql/data/lab02_results_n01_n15.json \
-              lab02_nosql/data/lab02_results_n16_n22.json
-
+python3 lab02_nosql/report/make_report.py --images lab02_nosql/evidence
+python3 lab02_nosql/report/make_docx.py   --images lab02_nosql/evidence
 bash lab02_nosql/pack_submission.sh B23DCKH105
 ```
+
+Bản PDF tự chọn tỉ lệ ảnh để không quá 6 trang; bản Word chèn ảnh rộng hết khổ chữ và cao tối
+đa 11 cm.
 
 ## Kiểm tra không lộ bí mật trước khi commit/nộp
 

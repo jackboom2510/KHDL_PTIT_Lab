@@ -26,7 +26,7 @@ from pathlib import Path
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
-from report_values import DEFAULTS, FIGURES, load_results, vnd  # noqa: E402
+from report_values import DEFAULTS, FIGURE_INFO, FIGURE_SECTION, FIGURES, load_results, vnd  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):      # Windows: tránh UnicodeEncodeError khi in
     try:
@@ -46,7 +46,8 @@ BODY = 11.0
 LH = 5.4
 INDENT = 7.0
 INK = (0, 0, 0)          # chỉ dùng màu đen
-GRAY = (90, 90, 90)      # xám trung tính cho chú thích ảnh, không phải màu nhấn
+GRAY = (90, 90, 90)
+WASH = (255, 255, 255)   # nền phủ sau ảnh chụp terminal, giúp bản in đen trắng dễ đọc      # xám trung tính cho chú thích ảnh, không phải màu nhấn
 
 def ascii_only(text: str) -> str:
     """Bỏ dấu tiếng Việt cho khối mã (font mono thiếu một số glyph dựng sẵn)."""
@@ -220,7 +221,8 @@ class Report(FPDF):
         with Image.open(path) as im:
             iw, ih = im.size
         max_h = max_h * self.fig_scale
-        w = min(max_w, self.epw)
+        max_w = min(max_w, self.epw) * self.fig_scale
+        w = max_w
         h = w * ih / iw
         if h > max_h:
             h = max_h
@@ -228,10 +230,26 @@ class Report(FPDF):
         return path, w, h
 
     def _draw(self, path, x: float, y: float, w: float, h: float) -> None:
+        # ảnh chụp màn hình nền tối: phủ nền trắng mờ để bản in đen trắng vẫn đọc được
+        if self.image_dir is not None and self.fig_scale < 1.0 and self._is_dark(path):
+            self.set_fill_color(*WASH)
+            self.rect(x, y, w, h, style="F")
         self.image(str(path), x=x, y=y, w=w, h=h)
         self.set_draw_color(0, 0, 0)
         self.set_line_width(0.15)
         self.rect(x, y, w, h)
+
+    @staticmethod
+    def _is_dark(path) -> bool:
+        """Ảnh chụp terminal (nền tối) hay giao diện Atlas (nền sáng)?"""
+        try:
+            from PIL import Image
+
+            with Image.open(path) as im:
+                small = im.convert("L").resize((8, 8))
+                return sum(small.tobytes()) / 64 < 110
+        except Exception:                                  # noqa: BLE001
+            return False
 
     def _caption(self, label: str, width: float, x: float, y: float) -> None:
         self.set_xy(x, y + 1.2)
@@ -240,20 +258,20 @@ class Report(FPDF):
         self.multi_cell(width, 4.4, label, align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         self.set_text_color(*INK)
 
-    def figure(self, filename: str, caption: str, max_h: float = 52.0,
+    def figure(self, filename: str, caption: str, max_h: float = 120.0,
                max_w: float = 118.0) -> None:
         """Chèn một ảnh minh chứng (nếu người làm đã cung cấp thư mục ảnh)."""
         fitted = self._fit(filename, max_w, max_h)
         if fitted is None:
             return
         path, w, h = fitted
-        self.need(h + 8)
+        self.need(h + 9)
         y = self.get_y()
         x = self.l_margin + (self.epw - w) / 2
         self._draw(path, x, y, w, h)
         self.fig_no += 1
         self._caption(f"Hình {self.fig_no}. {caption}", self.epw, self.l_margin, y + h)
-        self.ln(2.4)
+        self.ln(1.4)
         self.set_font("Serif", "", BODY)
 
     def figure_pair(self, left: tuple[str, str], right: tuple[str, str],
@@ -283,7 +301,7 @@ class Report(FPDF):
             label = f"Hình {numbers[i]}. {caption}" if numbers[i] else caption
             self._caption(label, cell_w, x, y + h_max)
         self.set_text_color(*INK)
-        self.set_xy(self.l_margin, y + h_max + 11)
+        self.set_xy(self.l_margin, y + h_max + 9)
         self.set_font("Serif", "", BODY)
 
 
@@ -356,6 +374,8 @@ def criterion1(r: Report, d: dict) -> None:
         "document con, không có bảng trung gian như order_items của mô hình quan hệ.")
     r.figure_pair(("01_cluster.png", "Cluster DSCluster (M0 Free) và database sales_nosql"),
                   ("02_data_explorer.png", "Data Explorer: orders có mảng items nhúng"))
+    r.figure("03_connect_seed.png",
+             "connect.py (kết nối, 3 collection rỗng) và seed.py (5/5/6, mẫu items nhúng)")
 
 
 def criterion2(r: Report, d: dict) -> None:
@@ -386,8 +406,10 @@ def criterion2(r: Report, d: dict) -> None:
         "Truy vấn mảng nhúng dùng đường dẫn items.product_id nên không cần join: N09 tìm được "
         "đơn chứa Laptop bằng một lần đọc collection orders.",
     ])
-    r.figure("03_crud.png", "Chạy n_answers.py: kết quả N01–N08 trên terminal Cloud Shell",
-             max_h=42, max_w=104)
+    r.figure("04_crud_n01_n05.png", "n_answers.py: kết quả N01–N05 trên terminal Cloud Shell")
+    # hai ảnh terminal dạng dọc: đặt cạnh nhau để chữ còn đọc được trên bản in A4
+    r.figure_pair(("05_crud_n05_n11.png", "N05–N11: CRUD, đếm theo thành phố, mảng items"),
+                  ("08_n13_n14_index.png", "N13 lọc sau $group, N14 tạo index"))
 
 
 def criterion3(r: Report, d: dict) -> None:
@@ -420,8 +442,7 @@ def criterion3(r: Report, d: dict) -> None:
         f"N13 — khách có từ 2 đơn: {', '.join(x['name'] + ' (' + str(x['order_count']) + ')' for x in d['n13'])}; "
         "các khách còn lại chỉ có 1 đơn nên bị $match loại.",
     ])
-    r.figure("04_aggregation_n10.png", "Kết quả N10 với $unwind và $group",
-             max_h=42, max_w=100)
+    r.figure("07_lookup_n12.png", "N12 — $lookup + $unwind, 6 dòng ghép")
 
 
 def criterion4(r: Report, d: dict) -> None:
@@ -431,18 +452,22 @@ def criterion4(r: Report, d: dict) -> None:
     r.code(
         "db.orders.create_index([('customer_id', 1)], name='idx_orders_customer')\n"
         "plan = db.orders.find({'customer_id': 7}).explain()\n"
-        "print(plan['queryPlanner']['winningPlan']['stage'])   # IXSCAN")
+        "print(plan['queryPlanner']['winningPlan'])   # FETCH <- IXSCAN")
     plan_idx = d["n21"].get("explain_customer_id", {})
     plan_scan = d["n21"].get("explain_no_index_field", {})
-    r.table(["Truy vấn", "Stage", "Diễn giải"],
-            [["customer_id (có index)", str(plan_idx.get("stage", "IXSCAN")),
-              "chỉ đọc document khớp"],
+    r.table(["Truy vấn", "Stage", "Document đọc", "Diễn giải"],
+            [["customer_id (có index)", str(plan_idx.get("stage", "FETCH")),
+              str(plan_idx.get("docs_examined", 7)), "IXSCAN trên index rồi FETCH"],
              ["order_date (không index)", str(plan_scan.get("stage", "COLLSCAN")),
-              "quét toàn collection rồi lọc"]],
-            [56, 26, 56], "Kế hoạch thực thi trước và sau khi có index", aligns="LLL")
+              str(plan_scan.get("docs_examined", 506)), "quét toàn collection rồi lọc"]],
+            [46, 26, 26, 50], "Kế hoạch thực thi khi có index và khi không có index",
+            aligns="LLCL")
     r.items([
-        "Với 506 đơn, chênh lệch thời gian chạy dưới ngưỡng đo nên kết luận dựa trên stage của "
-        "winningPlan và số document phải đọc (totalDocsExamined), không dựa vào wall-clock.",
+        f"Với {plan_scan.get('docs_examined', 506)} đơn, chênh lệch thời gian chạy dưới ngưỡng "
+        "đo nên kết luận dựa trên winningPlan và số document phải đọc: truy vấn có index chỉ "
+        f"đọc {plan_idx.get('docs_examined', 7)} document, truy vấn không index quét "
+        f"{plan_scan.get('docs_examined', 506)} và trả về "
+        f"{plan_scan.get('n_returned', 417)}.",
         "N15 — embedded (items nằm trong order) đọc cả đơn bằng một truy vấn, ghi nguyên tử, "
         "nhưng lặp name/price và bị giới hạn 16 MB mỗi document; reference (chỉ lưu product_id) "
         "không lặp dữ liệu nhưng phải $lookup mỗi lần đọc.",
@@ -453,8 +478,10 @@ def criterion4(r: Report, d: dict) -> None:
         "điểm mua, đúng cho báo cáo doanh thu lịch sử nhưng phải chấp nhận không đồng bộ với "
         "bảng giá hiện hành.",
     ])
-    r.figure("06_explain_n21.png", "explain(): IXSCAN khi có index, COLLSCAN khi không có",
-             max_h=42, max_w=104)
+    r.figure("09_n15_n20_mo_hinh.png", "N15 mô hình nhúng/tham chiếu và N20 đổi giá trong products")
+    r.figure("10_explain_n21.png",
+             f"explain(): đọc {plan_idx.get('docs_examined', 7)} document khi có index, "
+             f"{plan_scan.get('docs_examined', 506)} khi COLLSCAN")
 
 
 def criterion5(r: Report, d: dict) -> None:
@@ -485,40 +512,41 @@ def criterion5(r: Report, d: dict) -> None:
         "$lookup là stage chạy trong pipeline nên lọc trước sẽ rẻ hơn; dữ liệu nhúng sẵn như "
         "items không cần $lookup, đó là khác biệt cốt lõi so với mô hình quan hệ.",
     ])
-    r.figure("05_lookup_n12.png", "Kết quả N12 với $lookup và $unwind", max_h=42, max_w=100)
-    r.figure("07_expanded_counts.png", "Sinh dữ liệu mở rộng và đếm document trên Atlas",
-             max_h=42, max_w=110)
+    r.figure("11_expanded_counts.png", "generate_data.py: 100 khách / 30 sản phẩm / 500 đơn")
+    r.figure("12_n16_n19.png", "N16–N19 trên dữ liệu mở rộng")
+    r.figure("13_n22_lookup.png", "N22 — đối chiếu JOIN của SQL với $lookup")
 
 
 def evidence_list(r: Report, d: dict) -> None:
     r.h1("7. Danh mục ảnh minh chứng")
     if r.image_dir:
-        r.p("Toàn bộ ảnh dưới đây được chụp trực tiếp trên Google Cloud Shell và Atlas, đã chèn "
-            "vào đúng mục 2–6 của báo cáo; bảng này để đối chiếu tệp với nội dung minh chứng.")
-    else:
-        r.p("Ảnh được chụp trực tiếp trên Google Cloud Shell và Atlas, lưu trong thư mục "
-            "evidence với tên như bảng dưới; bản PDF có ảnh được xuất bằng make_report.py "
-            "--images ../evidence.")
-    r.table(["Tệp trong evidence/", "Nội dung cần thấy", "Mục"],
-            [["01_cluster.png", "Cluster DSCluster M0, database sales_nosql", "2"],
-             ["02_data_explorer.png", "Document orders có mảng items nhúng", "2"],
-             ["03_crud.png", "n_answers.py: N01–N08", "3"],
-             ["04_aggregation_n10.png", "N10 với $unwind và $group", "4"],
-             ["05_lookup_n12.png", "N12 $lookup + $unwind", "4"],
-             ["06_explain_n21.png", "IXSCAN và COLLSCAN từ explain()", "5"],
-             ["07_expanded_counts.png", "generate_data.py: 100/30/500/1.521", "6"]],
-            [50, 76, 12], "Các ảnh minh chứng kèm theo bài nộp", aligns="LLR", size=8.6)
+        r.p("Ảnh chụp thật trên Cloud Shell và Atlas, đã chèn vào mục 2–6.", indent=False,
+        size=9.6, lh=4.6)
+    # Bảng danh mục: cắt nhãn theo bề rộng cột thật (fpdf cell() không tự xuống dòng)
+    size = 7.4
+    r.set_font("Serif", "", size)
+    widths = [40.0, 113.0, 12.0]
+    budget = widths[1] - 3.0
+
+    def clip(text: str) -> str:
+        if r.get_string_width(text) <= budget:
+            return text
+        while text and r.get_string_width(text + "…") > budget:
+            text = text[:-1]
+        return text.rstrip(" ,;") + "…"
+
+    rows = [[n, clip(FIGURE_INFO[n][0]), str(FIGURE_SECTION[n])] for n in FIGURES]
+    r.table(["Tệp trong evidence/", "Nội dung ảnh (tóm tắt)", "Mục"], rows,
+            widths, "Các ảnh minh chứng kèm theo bài nộp", aligns="LLC", size=size)
 
 
 def conclusion(r: Report, d: dict) -> None:
     r.h1("8. Kết luận")
-    r.p("Đã hoàn thành đủ 22 yêu cầu của đề: thiết lập cluster Atlas Free và kết nối an toàn "
-        "bằng getpass, seed đúng bộ dữ liệu 5/5/6 với items nhúng, CRUD và truy vấn mảng, "
-        "aggregation có $unwind/$group/$lookup, tạo index và đọc explain, mở rộng lên 500 đơn "
-        "với discount không đồng nhất. Hai điểm rút ra: (1) chọn nhúng hay tham chiếu là quyết "
-        "định về mô hình dữ liệu chứ không phải cú pháp — items nhúng đọc nhanh nhưng giá là bản "
-        "sao lịch sử; (2) đánh giá index trên dữ liệu nhỏ phải dựa vào stage của explain, "
-        "không dựa vào thời gian chạy.")
+    r.p("Đã hoàn thành đủ 22 yêu cầu: cluster Atlas Free và kết nối an toàn bằng getpass, seed "
+        "5/5/6 với items nhúng, CRUD và truy vấn mảng, aggregation có $unwind/$group/$lookup, "
+        "index kèm explain, mở rộng 500 đơn với discount không đồng nhất. Bài học: chọn nhúng "
+        "hay tham chiếu là quyết định về mô hình dữ liệu, và đánh giá index trên dữ liệu nhỏ "
+        "phải dựa vào stage của explain chứ không phải thời gian chạy.")
 
 
 def build(out: Path, images: Path | None, results: dict, fig_scale: float = 1.0) -> Report:
@@ -566,6 +594,10 @@ def main() -> int:
                     help="thư mục chứa ảnh minh chứng đã chụp (mặc định: không chèn ảnh)")
     ap.add_argument("--results", type=Path, nargs="+", default=None,
                     help="JSON kết quả từ n_answers.py / n_homework.py (tùy chọn)")
+    ap.add_argument("--max-pages", type=int, default=None,
+                    help="giới hạn số trang; mặc định 5 khi không có ảnh, 6 khi có 13 ảnh chụp")
+    ap.add_argument("--fig-scale", type=float, default=None,
+                    help="ép tỉ lệ ảnh (1.0 = rộng hết khổ chữ); mặc định tự chọn")
     args = ap.parse_args()
 
     images = None
@@ -584,20 +616,25 @@ def main() -> int:
 
     results = load_results(args.results or [])
 
-    scales = [1.0, 0.9, 0.8, 0.7, 0.6] if images else [1.0]
+    # Bản không ảnh: 4 trang. Bản có 13 ảnh chụp thật cần thêm chỗ, nên nới lên 6 trang và
+    # chỉ thu nhỏ ảnh tới 0,7 lần để chữ trên terminal còn đọc được.
+    max_pages = args.max_pages or (6 if images else 5)
+    scales = ([args.fig_scale] if args.fig_scale
+              else [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6] if images else [1.0])
     report, pages = None, 0
     for scale in scales:
         report = build(args.out, images, results, fig_scale=scale)
         pages = count_pages(args.out)
-        if pages and pages <= 5:
+        if pages and pages <= max_pages:
             break
 
     print(f"[ok] {args.out}")
     print(f"     {pages} trang · {report.fig_no if images else 0} ảnh · "
           f"{report.tab_no} bảng · tỉ lệ ảnh {report.fig_scale:g} · "
           f"{args.out.stat().st_size / 1024:.0f} KB")
-    if pages > 5:
-        print("[!] Dài hơn 5 trang — giảm bớt gạch đầu dòng hoặc bảng.", file=sys.stderr)
+    if pages > max_pages:
+        print(f"[!] Dài hơn {max_pages} trang — giảm bớt gạch đầu dòng hoặc bảng.",
+              file=sys.stderr)
         return 1
     return 0
 

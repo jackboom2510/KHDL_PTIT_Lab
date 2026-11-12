@@ -14,8 +14,8 @@ của đề, không trình bày kiểu đồ án (không bìa riêng, không m�
 | `make_docx.py` | Sinh báo cáo Word có **khung chèn ảnh** ở đúng vị trí 7 ảnh |
 | `requirements.txt` | `fpdf2`, `pillow`, `python-docx` (tuỳ chọn `pypdfium2` để đếm trang) |
 | `pdf_pages.py` | Đếm số trang PDF (dùng nội bộ) |
-| `BaoCao_LAB02_B23DCKH105.pdf` | Bản đã xuất, **4 trang** khi chưa chèn ảnh |
-| `BaoCao_LAB02_B23DCKH105.docx` | Bản Word, **7 khung nét đứt** chờ dán ảnh chụp thật |
+| `BaoCao_LAB02_B23DCKH105.pdf` | Bản đã xuất, **4 trang** khi chưa chèn ảnh, **6 trang** với 12 ảnh chụp thật |
+| `BaoCao_LAB02_B23DCKH105.docx` | Bản Word: 12 ảnh đã chèn; nếu thiếu ảnh thì để khung nét đứt chờ dán |
 
 ## Xuất báo cáo
 
@@ -74,11 +74,13 @@ trang; tiêu đề mục dùng style *Heading 1* nên hiện trong Navigation Pa
 7. Danh mục ảnh minh chứng — tên tệp, nội dung cần thấy, mục tương ứng.
 8. Kết luận — ngắn, hai điểm rút ra.
 
-Mục 7 là bảng danh mục ảnh: tệp trong `evidence/`, nội dung cần thấy, mục tương ứng.
+Mục 7 là bảng danh mục 12 ảnh: tệp trong `evidence/`, nội dung cần thấy, mục tương ứng.
 
 Toàn bộ chữ màu đen trên nền trắng; xám chỉ cho chú thích ảnh. Không nền tô, không icon, gạch
-đầu dòng là `-`, bảng chỉ kẻ đường ngang. Script tự đếm trang và thu nhỏ ảnh dần (1,0 → 0,6) nếu
-vượt 5 trang; vẫn vượt thì thoát mã lỗi 1.
+đầu dòng là `-`, bảng chỉ kẻ đường ngang. Script tự đếm trang trong lúc xuất: bản không ảnh phải
+≤ 5 trang, bản có ảnh ≤ 6 trang (thu nhỏ ảnh 1,0 → 0,6 và phủ nền trắng mờ sau ảnh chụp terminal
+để bản in đen trắng còn đọc được); vẫn vượt thì thoát mã lỗi 1. Ép thủ công bằng `--fig-scale` và
+`--max-pages`.
 
 ## Số liệu
 

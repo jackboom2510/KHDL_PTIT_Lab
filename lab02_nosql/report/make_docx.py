@@ -44,6 +44,7 @@ GRAY = RGBColor(0x59, 0x59, 0x59)
 
 PLACEHOLDER_HEIGHT_CM = 6.2
 IMAGE_WIDTH_CM = 15.5
+IMAGE_MAX_HEIGHT_CM = 11.0
 TEXT_WIDTH_CM = 16.0
 
 
@@ -264,7 +265,20 @@ class Doc:
             paragraph = self.doc.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             _spacing(paragraph, after=2)
-            paragraph.add_run().add_picture(str(path), width=Cm(IMAGE_WIDTH_CM))
+            run = paragraph.add_run()
+            run.add_picture(str(path), width=Cm(IMAGE_WIDTH_CM))
+            shape = run._element.xpath(".//wp:inline")[0]
+            extent = shape.find(qn("wp:extent"))
+            width_emu, height_emu = int(extent.get("cx")), int(extent.get("cy"))
+            max_emu = int(IMAGE_MAX_HEIGHT_CM * 360000)
+            if height_emu > max_emu:                     # ảnh dọc: thu theo chiều cao
+                ratio = max_emu / height_emu
+                new_w, new_h = int(width_emu * ratio), min(int(height_emu * ratio), max_emu)
+                extent.set("cx", str(new_w))
+                extent.set("cy", str(new_h))
+                for node in shape.iter(qn("a:ext")):
+                    node.set("cx", str(new_w))
+                    node.set("cy", str(new_h))
         else:
             table = self.doc.add_table(rows=1, cols=1)
             table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -373,8 +387,9 @@ def criterion1(r: Doc, d: dict):
     r.p("Kiểm tra trên Atlas → Data Explorer: mở một order thấy trường items là array các "
         "document con, không có bảng trung gian như order_items của mô hình quan hệ.",
         first_indent=True)
-    r.figure("01_cluster.png", "Atlas > Database và Browse Collections")
+    r.figure("01_cluster.png", "Atlas > Data Explorer: cluster DSCluster và database sales_nosql")
     r.figure("02_data_explorer.png", "Atlas > Data Explorer, collection orders")
+    r.figure("03_connect_seed.png", "Cloud Shell: connect.py và seed.py")
 
 
 def criterion2(r: Doc, d: dict):
@@ -406,7 +421,9 @@ def criterion2(r: Doc, d: dict):
         "Truy vấn mảng nhúng dùng đường dẫn items.product_id nên không cần join: N09 tìm được "
         "đơn chứa Laptop bằng một lần đọc collection orders.",
     ])
-    r.figure("03_crud.png", "Chạy n_answers.py trên Cloud Shell (phần N01–N08)")
+    r.figure("04_crud_n01_n05.png", "n_answers.py — phần N01–N05")
+    r.figure("05_crud_n05_n11.png", "n_answers.py — phần N05–N11")
+    r.figure("08_n13_n14_index.png", "n_answers.py — N13 và N14 (tạo index)")
 
 
 def criterion3(r: Doc, d: dict):
@@ -438,8 +455,7 @@ def criterion3(r: Doc, d: dict):
         f"{', '.join(x['name'] + ' (' + str(x['order_count']) + ')' for x in d['n13'])}; các "
         "khách còn lại chỉ có 1 đơn nên bị $match loại.",
     ])
-    r.figure("04_aggregation_n10.png", "Chạy n_answers.py — phần N10")
-    r.figure("05_lookup_n12.png", "Chạy n_answers.py — phần N12")
+    r.figure("07_lookup_n12.png", "Chạy n_answers.py — phần N12")
 
 
 def criterion4(r: Doc, d: dict):
@@ -471,7 +487,8 @@ def criterion4(r: Doc, d: dict):
         "tại thời điểm mua, đúng cho báo cáo doanh thu lịch sử nhưng phải chấp nhận không đồng "
         "bộ với bảng giá hiện hành.",
     ])
-    r.figure("06_explain_n21.png", "Chạy n_homework.py — phần N21")
+    r.figure("09_n15_n20_mo_hinh.png", "n_answers.py — N15, n_homework.py — N20")
+    r.figure("10_explain_n21.png", "Chạy n_homework.py — phần N21")
 
 
 def criterion5(r: Doc, d: dict):
@@ -503,7 +520,9 @@ def criterion5(r: Doc, d: dict):
         "nhưng $lookup là stage chạy trong pipeline nên lọc trước sẽ rẻ hơn; dữ liệu nhúng sẵn "
         "như items không cần $lookup, đó là khác biệt cốt lõi so với mô hình quan hệ.",
     ])
-    r.figure("07_expanded_counts.png", "Cloud Shell: generate_data.py --force")
+    r.figure("11_expanded_counts.png", "Cloud Shell: generate_data.py --force")
+    r.figure("12_n16_n19.png", "n_homework.py — N16 đến N19")
+    r.figure("13_n22_lookup.png", "n_homework.py — N22")
 
 
 def evidence_list(r: Doc, d: dict):
