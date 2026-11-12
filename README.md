@@ -46,11 +46,18 @@ Repo bài thực hành môn **Introduction to Data Science (PTIT)**:
 │   │   └── README.md          # cách xuất báo cáo, quy ước trình bày
 ├── lab02_nosql/
 │   ├── AGENTS.md
-│   ├── n_answers.py           # BẮT BUỘC  — N01–N15 (sẽ thêm ở M4)
-│   ├── n_homework.py          # BỔ SUNG — N16–N22 (sẽ thêm ở M5)
-│   ├── data/                  # dữ liệu trung gian (không commit)
-│   ├── report/
-│   └── evidence/
+│   ├── connect.py             # getpass + ping -> database sales_nosql
+│   ├── seed.py                # nạp 5 khách / 5 SP / 6 đơn, items nhúng
+│   ├── lab_queries.py         # ví dụ CRUD / truy vấn trong đề
+│   ├── n_answers.py           # BẮT BUỘC  — N01–N15
+│   ├── n_homework.py          # BỔ SUNG — N16–N22
+│   ├── generate_data.py       # 100 khách / 30 SP / 500 đơn / 1.521 dòng items
+│   ├── check_offline.py       # chạy thử N01–N22 bằng mongomock (không cần Atlas)
+│   ├── utf8_console.py        # ép stdout UTF-8 (Windows)
+│   ├── pack_submission.sh     # đóng gói submission/StudentID_NoSQL.zip
+│   ├── data/                  # JSON kết quả chạy (không commit)
+│   ├── report/                # make_report.py + PDF 4–5 trang
+│   └── evidence/              # 7 ảnh chụp Atlas/Cloud Shell + hướng dẫn chụp
 └── submission/                # ZIP bài nộp (không commit)
 ```
 
@@ -146,10 +153,32 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install "pymongo[srv]"
 
 python3 connect.py        # dán URI mongodb+srv://... khi được hỏi (ký tự không hiển thị)
-python3 seed.py           # seed 3 collection mẫu (chỉ chạy trên DB rỗng)
-python3 lab_queries.py    # ví dụ CRUD + aggregation trong đề
-python3 n_answers.py      # đáp án N01–N22
+python3 seed.py           # seed 3 collection mẫu 5/5/6 (chỉ chạy trên DB rỗng)
+python3 lab_queries.py    # ví dụ CRUD + truy vấn trong đề
+
+# Phần BẮT BUỘC — N01–N15 (n_answers.py), xuất kèm JSON cho báo cáo
+python3 n_answers.py --json data/lab02_results_n01_n15.json
+
+# Phần BỔ SUNG — dữ liệu mở rộng rồi N16–N22 (n_homework.py)
+python3 generate_data.py --force
+python3 n_homework.py --json data/lab02_results_n16_n22.json
+
+# Kiểm tra nhanh không cần Atlas (mongomock) — bắt lỗi pipeline trước khi chạy thật
+pip install mongomock
+python3 check_offline.py
 ```
+
+Báo cáo PDF 4–5 trang, đen trắng, theo 5 tiêu chí chấm (giống LAB 01):
+
+```bash
+python3 lab02_nosql/report/make_report.py \
+    --images lab02_nosql/evidence \
+    --results lab02_nosql/data/lab02_results_n01_n15.json \
+              lab02_nosql/data/lab02_results_n16_n22.json
+```
+
+Ảnh minh chứng (7 ảnh chụp thật trên Atlas + Cloud Shell) xem
+[`lab02_nosql/evidence/HUONG_DAN_CHUP_ANH.md`](lab02_nosql/evidence/HUONG_DAN_CHUP_ANH.md).
 
 **Không bao giờ** ghi URI có mật khẩu vào file, ảnh chụp hay commit. Nếu IP Cloud Shell đổi:
 `curl -4 https://api.ipify.org` rồi cập nhật Atlas → Network Access.
@@ -159,18 +188,16 @@ python3 n_answers.py      # đáp án N01–N22
 - `StudentID_SQL.zip` — `data/sales.db`, `sql_console.py`, `sql/answers.sql` (S01–S15),
   `sql/answers_homework.sql` (S16–S21), `sql/explain.sql`, `build_db.py`, `generate_data.py`,
   `run_sql.py`, báo cáo PDF 4–5 trang, ảnh minh chứng.
-- `StudentID_NoSQL.zip` — `connect.py`, `seed.py`, `lab_queries.py`, mã giải N01–N22, báo cáo
-  PDF 2–3 trang, ảnh Data Explorer/terminal.
+- `StudentID_NoSQL.zip` — `connect.py`, `seed.py`, `lab_queries.py`, `n_answers.py` (N01–N15),
+  `n_homework.py` (N16–N22), `generate_data.py`, `check_offline.py`, báo cáo PDF 4–5 trang, 7 ảnh
+  minh chứng, `README_MAPPING.txt`.
 
-Đóng gói gợi ý (đặt trong `submission/`, thư mục này không được commit):
+Đóng gói bằng script (tự kiểm tra secret, tự chọn `zip`/`zipfile`, đặt trong `submission/` —
+thư mục này không được commit):
 
 ```bash
-cd lab01_sql && zip -r ../submission/StudentID_SQL.zip \
-  data/sales.db sql_console.py build_db.py generate_data.py run_sql.py \
-  sql/schema.sql sql/seed.sql sql/answers.sql sql/answers_homework.sql sql/explain.sql \
-  report evidence
-cd ../lab02_nosql && zip -r ../submission/StudentID_NoSQL.zip \
-  connect.py seed.py lab_queries.py n_answers.py n_homework.py generate_data.py report evidence
+bash lab01_sql/pack_submission.sh B23DCKH105    # -> submission/B23DCKH105_SQL.zip
+bash lab02_nosql/pack_submission.sh B23DCKH105  # -> submission/B23DCKH105_NoSQL.zip
 ```
 
 ## Tài liệu tham khảo
